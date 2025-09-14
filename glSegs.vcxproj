@@ -156,6 +156,10 @@
     <ClInclude Include="src\glState\glState.h" />
     <ClInclude Include="src\glState\stack.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\glState\shader.frag" />
+    <None Include="src\glState\shader.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

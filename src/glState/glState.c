@@ -38,6 +38,7 @@ void gls_vec3f_div(gls_Vec3f* left, gls_Vec3f right)
 	left->z /= right.z;
 }
 
+
 gls_Vec3f gls_vec3f(float x, float y, float z)
 {
 	gls_Vec3f vec;
@@ -78,24 +79,10 @@ void gls_init()
 	glEnable(GL_DEPTH_TEST);
 
 	static const char* vertShaderSrc =
-		"#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"layout (location = 1) in vec3 aColor;\n"
-		"out vec3 pixColor;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos, 1);\n"
-		"   pixColor = aColor;\n"
-		"}\0";
+#include "shader.vert"
 
 	static const char* fragShaderSrc =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"in vec3 pixColor;\n"
-		"void main()\n"
-		"{\n"
-		"   FragColor = vec4(pixColor, 1);\n"
-		"}\n\0";
+#include "shader.frag"
 
 
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
@@ -238,23 +225,8 @@ void gls_vertex(float x, float y, float z)
 {
 	gls_Vec3f p = gls_applyTrans(x, y, z);
 
-	gls_Vec3f s = { 
-		sinf(gls_toRad(_gls_camera.rot.x)), 
-		sinf(gls_toRad(_gls_camera.rot.y)), 
-		sinf(gls_toRad(_gls_camera.rot.z)) };
-	gls_Vec3f c = { 
-		cosf(gls_toRad(_gls_camera.rot.x)), 
-		cosf(gls_toRad(_gls_camera.rot.y)), 
-		cosf(gls_toRad(_gls_camera.rot.z)) };
-	gls_Vec3f d = {
-		c.y * (s.z * p.y + c.z * p.x) - s.y * p.z,
-		s.x * (c.y * p.z + s.y * (s.z * p.y + c.z * p.x)) + c.x * (c.z * p.y - s.z * p.x),
-		c.x * (c.y * p.z + s.y * (s.z * p.y + c.z * p.x)) - s.x * (c.z * p.y - s.z * p.x) };
+	gls_Vec3f vec = gls_project(p);
 
-	float bx = d.x * 1000.f / (d.z * _gls_width);
-	float by = d.y * 1000.f / (d.z * _gls_height);
-
-	gls_Vec3f vec = { bx, by, d.z / 1000.f };
 	stack_push(&_gls_verts, &vec);
 
 	stack_push(&_gls_verts, &gls_getState()->color);
@@ -270,11 +242,14 @@ void gls_vertex(float x, float y, float z)
 gls_Vec3f gls_applyTrans(float x, float y, float z)
 {
 	// origin by itself is just translate
+	//
 	// translate happens before rotation
 	// rotation rotates all points around origin
-	// origin is added back to rotated points
 	// camera position is removed from points
-	// camera rotation is used in math magic
+
+	// BUGS:
+	// - rotates 180deg in all axises every iteration
+	// - z origin does nothing
 
 	gls_Vec3f point = { x, y, z };
 
@@ -285,24 +260,46 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 		gls_vec3f_add(&point, gls_getStateIndex(i)->translate);
 		gls_vec3f_mul(&point, gls_getStateIndex(i)->scale);
 
-		angle = gls_toDeg(atan2f(gls_getStateIndex(i)->origin.x - point.x, 
+		angle = gls_toDeg(atan2f(gls_getStateIndex(i)->origin.x - point.x,
 			gls_getStateIndex(i)->origin.z - point.z));
 		 dist = sqrtf(powf(gls_getStateIndex(i)->origin.x - point.x, 2) + 
 			 powf(gls_getStateIndex(i)->origin.z - point.z, 2));
 		point.x = dist * sinf(gls_toRad(angle + gls_getStateIndex(i)->rotate.y));
 		point.z = dist * cosf(gls_toRad(angle + gls_getStateIndex(i)->rotate.y));
 
-		angle3d = gls_toDeg(atan2f(gls_getStateIndex(i)->origin.y - point.y, 
+		angle3d = gls_toDeg(atan2f(gls_getStateIndex(i)->origin.y - point.y,
 			gls_getStateIndex(i)->origin.z - point.z));
 		dist3d = sqrtf(powf(gls_getStateIndex(i)->origin.y - point.y, 2) + 
 			powf(gls_getStateIndex(i)->origin.z - point.z, 2));
-		point.y = dist3d * sinf(gls_toRad(angle3d + gls_getStateIndex(i)->rotate.x));
-		point.z = dist3d * cosf(gls_toRad(angle3d + gls_getStateIndex(i)->rotate.x));
+		point.y = -dist3d * sinf(gls_toRad(angle3d + gls_getStateIndex(i)->rotate.x));
+		point.z = -dist3d * cosf(gls_toRad(angle3d + gls_getStateIndex(i)->rotate.x));
 	}
 
 	gls_vec3f_sub(&point, _gls_camera.pos);
 
 	return point;
+}
+
+gls_Vec3f gls_project(gls_Vec3f p)
+{
+	gls_Vec3f s = {
+		sinf(gls_toRad(_gls_camera.rot.x)),
+		sinf(gls_toRad(_gls_camera.rot.y)),
+		sinf(gls_toRad(_gls_camera.rot.z)) };
+	gls_Vec3f c = {
+		cosf(gls_toRad(_gls_camera.rot.x)),
+		cosf(gls_toRad(_gls_camera.rot.y)),
+		cosf(gls_toRad(_gls_camera.rot.z)) };
+	gls_Vec3f d = {
+		c.y * (s.z * p.y + c.z * p.x) - s.y * p.z,
+		s.x * (c.y * p.z + s.y * (s.z * p.y + c.z * p.x)) + c.x * (c.z * p.y - s.z * p.x),
+		c.x * (c.y * p.z + s.y * (s.z * p.y + c.z * p.x)) - s.x * (c.z * p.y - s.z * p.x) };
+
+	float bx = d.x * 1000.f / (d.z * _gls_width);
+	float by = d.y * 1000.f / (d.z * _gls_height);
+
+	return gls_vec3f(bx, by, d.z / 1000.f);
+
 }
 
 void gls_setWireframe(bool state)

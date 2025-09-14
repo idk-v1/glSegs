@@ -72,5 +72,6 @@ void gls_colorHSV(float h, float s, float v);
 
 void gls_vertex(float x, float y, float z);
 gls_Vec3f gls_applyTrans(float x, float y, float z);
+gls_Vec3f gls_project(gls_Vec3f p);
 
 void gls_setWireframe(bool state);

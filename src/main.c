@@ -16,7 +16,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_Vec3f color = gls_getState()->color;
 	
 	// left
-	gls_colorRGB(color.x, color.y, color.z);
+	gls_colorRGB(color.x - 0.1f, color.y, color.z);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -24,17 +24,8 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 
-	// back
-	gls_colorRGB(color.x - 0.05f, color.y - 0.05f, color.z - 0.05f);
-	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
-	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
-	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
-
 	// right
-	gls_colorRGB(color.x, color.y, color.z);
+	gls_colorRGB(color.x + 0.1f, color.y, color.z);
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
@@ -43,7 +34,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 
 	// front
-	gls_colorRGB(color.x + 0.05f, color.y + 0.05f, color.z + 0.05f);
+	gls_colorRGB(color.x, color.y, color.z + 0.1f);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -51,8 +42,17 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 
+		// back
+	gls_colorRGB(color.x, color.y, color.z - 0.1f);
+	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+
 	// bottom
-	gls_colorRGB(color.x - 0.1f, color.y - 0.1f, color.z - 0.1f);
+	gls_colorRGB(color.x, color.y - 0.1f, color.z);
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
@@ -61,7 +61,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 
 	// top
-	gls_colorRGB(color.x + 0.1f, color.y + 0.1f, color.z + 0.1f);
+	gls_colorRGB(color.x, color.y + 0.1f, color.z);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -78,18 +78,23 @@ void drawDino(double timer)
 	gls_pushState(); // body
 	gls_colorRGB(0.15f, 0.24f, 0.03f);
 	gls_origin(0.f, 0.f, 0.f);
-	gls_rotate(15.f, 0.f, 0.f);
+	gls_rotate(0.f, 0.f, 0.f);
 	gls_translate(0.f, 0.f, 0.f);
-	drawRect(5.f, 7.f, 7.f);
+	drawRect(5.f, 17.f, 25.f);
+
+		//gls_pushState(); // hacky rotate fix
+		//gls_rotate(0.f, 90.f, 0.f);
 
 		gls_pushState(); // body front
 		gls_colorRGB(0.15f, 0.24f, 0.03f);
-		gls_origin(0.f, 0.f, 8.5f);
-		gls_rotate(15.f, 0.f, 0.f);
-		gls_translate(0.f, 0.f, -5.f);
-		drawRect(5.f, 7.f, 10.f);
+		gls_origin(0.f, 0.f, (25.f + 5.f) / 2.f);
+		//gls_origin((25.f + 5.f) / 2.f, 0.f, 0.f);
+		gls_rotate(0.f, 0.f, 0.f);
+		gls_translate(0.f, 0.f, 0.f);
+		drawRect(5.f, 10.f, 5.f);
 
 		gls_popState(); // body front
+		//gls_popState(); // hacky rotate fix
 
 	gls_popState(); // body
 }
@@ -182,7 +187,7 @@ int main(int argc, char** argv)
 				deltaTime -= 1.f / 60.f;
 
 				gls_vec3f_add(&vel, accel);
-				gls_vec3f_mul(&vel, gls_vec3f(0.8, 0.8, 0.8));
+				gls_vec3f_mul(&vel, gls_vec3f(0.8f, 0.8f, 0.8f));
 				gls_vec3f_add(&pos, vel);
 
 				if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
@@ -193,8 +198,8 @@ int main(int argc, char** argv)
 
 			double mouseX, mouseY;
 			glfwGetCursorPos(window, &mouseX, &mouseY);
-			rot.y += (mouseX - width / 2.f) * lookSpeed;
-			rot.x += (mouseY - height / 2.f) * lookSpeed;
+			rot.y += (float)(mouseX - width / 2.f) * lookSpeed;
+			rot.x += (float)(mouseY - height / 2.f) * lookSpeed;
 			glfwSetCursorPos(window, width / 2.f, height / 2.f);
 
 			rot.x = gls_wrapDeg(rot.x);
