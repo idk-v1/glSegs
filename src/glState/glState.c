@@ -247,32 +247,29 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 	// rotation rotates all points around origin
 	// camera position is removed from points
 
-	// BUGS:
-	// - rotates 180deg in all axises every iteration
-	// - z origin does nothing
-
 	gls_Vec3f point = { x, y, z };
 
 	for (uint64_t i = _gls_state.length - 1; i > 0; i--)
 	{
-		float angle, angle3d, dist, dist3d;
+		float angleX, angleY, distXZ, distYZ;
 
 		gls_vec3f_add(&point, gls_getStateIndex(i)->translate);
+		gls_vec3f_add(&point, gls_getStateIndex(i)->origin);
+
+		gls_vec3f_sub(&point, gls_getStateIndex(i)->origin);
 		gls_vec3f_mul(&point, gls_getStateIndex(i)->scale);
 
-		angle = gls_toDeg(atan2f(gls_getStateIndex(i)->origin.x - point.x,
-			gls_getStateIndex(i)->origin.z - point.z));
-		 dist = sqrtf(powf(gls_getStateIndex(i)->origin.x - point.x, 2) + 
-			 powf(gls_getStateIndex(i)->origin.z - point.z, 2));
-		point.x = dist * sinf(gls_toRad(angle + gls_getStateIndex(i)->rotate.y));
-		point.z = dist * cosf(gls_toRad(angle + gls_getStateIndex(i)->rotate.y));
+		angleY = gls_toDeg(atan2f(point.x, point.z)) + gls_getStateIndex(i)->rotate.y;
+		distXZ = sqrtf(powf(point.x, 2) + powf(point.z, 2));
+		point.x = distXZ * sinf(gls_toRad(angleY));
+		point.z = distXZ * cosf(gls_toRad(angleY));
 
-		angle3d = gls_toDeg(atan2f(gls_getStateIndex(i)->origin.y - point.y,
-			gls_getStateIndex(i)->origin.z - point.z));
-		dist3d = sqrtf(powf(gls_getStateIndex(i)->origin.y - point.y, 2) + 
-			powf(gls_getStateIndex(i)->origin.z - point.z, 2));
-		point.y = -dist3d * sinf(gls_toRad(angle3d + gls_getStateIndex(i)->rotate.x));
-		point.z = -dist3d * cosf(gls_toRad(angle3d + gls_getStateIndex(i)->rotate.x));
+		angleX = gls_toDeg(atan2f(point.y, point.z)) + gls_getStateIndex(i)->rotate.x;
+		distYZ = sqrtf(powf(point.y, 2) + powf(point.z, 2));
+		point.y = distYZ * sinf(gls_toRad(angleX));
+		point.z = distYZ * cosf(gls_toRad(angleX));
+
+		gls_vec3f_add(&point, gls_getStateIndex(i)->origin);
 	}
 
 	gls_vec3f_sub(&point, _gls_camera.pos);
@@ -361,6 +358,25 @@ void gls_draw(bool clear)
 
 
 	glUseProgram(_gls_shader);
+
+	float aspect = (float)_gls_width / (float)_gls_height;
+	float far = 1000.f;
+	float near = 0.1f;
+	float proj[4 * 4] = { 0 };
+	proj[0 + 0 * 4] = 1.f / tanf(gls_toRad(45.f));
+	//proj[0][2] = (r + l) / (r - l);
+	proj[1 + 1 * 4] = 1.f / tanf(gls_toRad(45.f));
+	//proj[1][2] = (t + b) / (t - b);
+	proj[2 + 2 * 4] = -(far + near) / (far - near);
+	proj[2 + 3 * 4] = (-2 * far * near) / (far - near);
+	proj[3 + 2 * 4] = -1;
+	if (aspect < 1.f)
+		proj[0 + 0 * 4] /= aspect;
+	else
+		proj[1 + 1 * 4] /= aspect;
+	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "proj"), 1, true, proj);
+	float view[4 * 4] = { 0 };
+	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
 
 	if (clear)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -1,0 +1,7 @@
+ 5 × 10 body front
+25 × 17 body
+ 6 × 12 body back
+ 7 ×  9 body back back
+ 5 ×  6 body back back back
+12 ×  3 tail
+12 ×  2 tail tip

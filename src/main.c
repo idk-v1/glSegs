@@ -77,24 +77,54 @@ void drawDino(double timer)
 {
 	gls_pushState(); // body
 	gls_colorRGB(0.15f, 0.24f, 0.03f);
-	gls_origin(0.f, 0.f, 0.f);
-	gls_rotate(0.f, 0.f, 0.f);
-	gls_translate(0.f, 0.f, 0.f);
 	drawRect(5.f, 17.f, 25.f);
-
-		//gls_pushState(); // hacky rotate fix
-		//gls_rotate(0.f, 90.f, 0.f);
 
 		gls_pushState(); // body front
 		gls_colorRGB(0.15f, 0.24f, 0.03f);
 		gls_origin(0.f, 0.f, (25.f + 5.f) / 2.f);
-		//gls_origin((25.f + 5.f) / 2.f, 0.f, 0.f);
-		gls_rotate(0.f, 0.f, 0.f);
-		gls_translate(0.f, 0.f, 0.f);
 		drawRect(5.f, 10.f, 5.f);
 
 		gls_popState(); // body front
-		//gls_popState(); // hacky rotate fix
+
+		gls_pushState(); // body back
+		gls_colorRGB(0.15f, 0.24f, 0.03f);
+		gls_origin(0.f, 0.f, -(25.f + 6.f) / 2.f);
+		gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
+		drawRect(5.f, 12.f, 6.f);
+
+			gls_pushState(); // body back back
+			gls_colorRGB(0.15f, 0.24f, 0.03f);
+			gls_origin(0.f, 0.f, -(6.f + 7.f) / 2.f);
+			gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
+			drawRect(5.f, 9.f, 7.f);
+
+				gls_pushState(); // body back back back
+				gls_colorRGB(0.15f, 0.24f, 0.03f);
+				gls_origin(0.f, 0.f, -(7.f + 5.f) / 2.f);
+				gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
+				drawRect(5.f, 6.f, 5.f);
+
+					gls_pushState(); // tail
+					gls_colorRGB(0.15f, 0.24f, 0.03f);
+					gls_origin(0.f, 0.f, -(5.f + 12.f) / 2.f);
+					gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
+					drawRect(5.f, 3.f, 12.f);
+
+						gls_pushState(); // tail tip
+						gls_colorRGB(0.15f, 0.24f, 0.03f);
+						gls_origin(0.f, 0.f, -(12.f + 12.f) / 2.f);
+						gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
+						drawRect(5.f, 2.f, 12.f);
+
+						gls_popState(); // tail tip
+
+					gls_popState(); // tail
+
+				gls_popState(); // body back back back
+
+			gls_popState(); // body back back
+
+		gls_popState(); // body back
 
 	gls_popState(); // body
 }
