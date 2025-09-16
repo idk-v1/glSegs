@@ -144,7 +144,7 @@ void gls_pushState()
 {
 	gls_State state = { 0 };
 	state.scale = gls_vec3f(1, 1, 1);
-	state.color = gls_vec3f(1, 1, 1);
+	state.color = gls_getState()->color;
 	stack_push(&_gls_state, &state);
 }
 

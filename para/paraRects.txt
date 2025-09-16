@@ -8,8 +8,14 @@
 		15 ×  8 neck
 	 5 × 10 body front
 25 × 17 body
-	 6 × 12 body back
-		 7 ×  9 body back back
-			 5 ×  6 body tail start
-				12 ×  3 tail
-					12 ×  2 tail tip
+ 3 x 15 tail
+	 3 x 13 tail
+		 4 x 11 tail
+			 4 x  9 tail
+				 4 x  7 tail
+					 4 x  5 tail
+						 4 x  3 tail
+							 4 x  3 tail
+								 4 x  2 tail
+									 4 x  2 tail
+										 4 x  1 tail

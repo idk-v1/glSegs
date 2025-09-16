@@ -16,7 +16,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
 	
 	// left
-	gls_colorHSV(color.x, color.y, color.z - 0.05f);
+	gls_colorHSV(color.x, color.y, color.z - 0.0125f);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -25,7 +25,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 
 	// right
-	gls_colorHSV(color.x, color.y, color.z - 0.05f);
+	gls_colorHSV(color.x, color.y, color.z - 0.0125f);
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
@@ -76,43 +76,37 @@ void drawRect(float xs, float ys, float zs)
 void drawDino(float timer)
 {
 	gls_pushState(); // body
-	gls_colorRGB(0.15f, 0.24f, 0.03f);
-	drawRect(5.f, 17.f, 25.f);
+	gls_colorHSV(0.20f, 0.65f, 0.18f);
+	drawRect(13.f, 17.f, 25.f);
 
 		gls_pushState(); // body front
-		gls_colorRGB(0.15f, 0.24f, 0.03f);
 		gls_origin(0.f, 0.f, (25.f + 5.f) / 2.f);
 		drawRect(5.f, 10.f, 5.f);
 
 			gls_pushState(); // neck
-			gls_colorRGB(0.15f, 0.24f, 0.03f);
 			gls_origin(0.f, -1.f, 0.f);
 			gls_translate(0.f, 0.f, 15.f / 2.f);
 			gls_rotate(30.f + sinf(timer / 20.f) * 10.f, sinf(timer / 30.f) * 10.f, 0.f);
 			drawRect(5.f, 8.f, 15.f);
 
 				gls_pushState(); // neck upper
-				gls_colorRGB(0.15f, 0.24f, 0.03f);
 				gls_origin(0.f, 0.f, 15.f / 4.f);
 				gls_translate(0.f, 0.f, 13.f / 2.f);
 				gls_rotate(30.f + sinf(timer / 20.f) * 10.f, 0.f, 0.f);
 				drawRect(5.f, 8.f, 13.f);
 
 					gls_pushState(); // head
-					gls_colorRGB(0.15f, 0.24f, 0.03f);
 					gls_translate(0.f, -7.f / 2.f, 0.f);
 					gls_origin(0.f, 0.f, (13.f + 13.f) / 2.f);
 					gls_rotate(-90.f + sinf(timer / 20.f) * 10.f, 0.f, 0.f);
 					drawRect(5.f, 7.f, 13.f);
 
 						gls_pushState(); // upper jaw
-						gls_colorRGB(0.15f, 0.24f, 0.03f);
 						gls_origin(0.f, 1.5f, (13.f + 5.f) / 2.f);
 						drawRect(5.f, 3.f, 5.f);
 						gls_popState(); // upper jaw
 
 						gls_pushState(); // lower jaw
-						gls_colorRGB(0.15f, 0.24f, 0.03f);
 						gls_origin(0.f, -1.5f, 13.f / 2.f);
 						gls_translate(0.f, 0.f, 5.f / 2.f);
 						gls_rotate(sinf(timer / 10.f) * 10.f, 0.f, 0.f);
@@ -120,20 +114,17 @@ void drawDino(float timer)
 						gls_popState(); // lower jaw
 
 						gls_pushState(); // crest start
-						gls_colorRGB(0.15f, 0.24f, 0.03f);
 						gls_origin(0.f, -2.f, -(13.f + 5.f) / 2.f + 4.5f);
 						gls_rotate(60.f, 0.f, 0.f);
 						drawRect(5.f, 10.f, 6.f);
 
 							gls_pushState(); // crest
-							gls_colorRGB(0.15f, 0.24f, 0.03f);
 							gls_origin(0.f, 6.f / 2.f, 6.f / 2.f);
 							gls_translate(0.f, 0.f, -10.f / 2.f);
 							gls_rotate(-30.f, 0.f, 0.f);
 							drawRect(5.f, 3.f, 10.f);
 
 								gls_pushState(); // crest tip
-								gls_colorRGB(0.15f, 0.24f, 0.03f);
 								gls_origin(0.f, 0.f, -10.f / 2.f);
 								gls_translate(0.f, 0.f, -7.f / 2.f);
 								gls_rotate(20.f, 0.f, 0.f);
@@ -153,42 +144,90 @@ void drawDino(float timer)
 		gls_popState(); // body front
 
 		gls_pushState(); // body back
-		gls_colorRGB(0.15f, 0.24f, 0.03f);
-		gls_origin(0.f, 0.f, -(25.f + 6.f) / 2.f);
-		gls_rotate(sinf(timer / 30.f) * 10.f, sinf(timer / 20.f) * 10.f, 0.f);
-		drawRect(5.f, 12.f, 6.f);
+		gls_origin(0.f, 0.f, -25.f/ 2.f);
+		gls_translate(0.f, 0.f, -3.f / 2.f);
+		gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+		drawRect(12.f, 15.f, 3.f);
 
-			gls_pushState(); // body back back
-			gls_colorRGB(0.15f, 0.24f, 0.03f);
-			gls_origin(0.f, 0.f, -(6.f + 7.f) / 2.f);
-			gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
-			drawRect(5.f, 9.f, 7.f);
+			gls_pushState(); // body back 2
+			gls_origin(0.f, 0.f, -3.f / 2.f);
+			gls_translate(0.f, 0.f, -3.f / 2.f);
+			gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+			drawRect(10.f, 13.f, 3.f);
 
-				gls_pushState(); // tail start
-				gls_colorRGB(0.15f, 0.24f, 0.03f);
-				gls_origin(0.f, 0.f, -(7.f + 5.f) / 2.f);
-				gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
-				drawRect(5.f, 6.f, 5.f);
+				gls_pushState(); // body back 3
+				gls_origin(0.f, 0.f, -3.f / 2.f);
+				gls_translate(0.f, 0.f, -4.f / 2.f);
+				gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+				drawRect(9.f, 11.f, 4.f);
 
-					gls_pushState(); // tail
-					gls_colorRGB(0.15f, 0.24f, 0.03f);
-					gls_origin(0.f, 0.f, -(5.f + 12.f) / 2.f);
-					gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
-					drawRect(5.f, 3.f, 12.f);
+					gls_pushState(); // body back 4
+					gls_origin(0.f, 0.f, -4.f / 2.f);
+					gls_translate(0.f, 0.f, -4.f / 2.f);
+					gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+					drawRect(8.f, 9.f, 4.f);
 
-						gls_pushState(); // tail tip
-						gls_colorRGB(0.15f, 0.24f, 0.03f);
-						gls_origin(0.f, 0.f, -(12.f + 12.f) / 2.f);
-						gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
-						drawRect(5.f, 2.f, 12.f);
+						gls_pushState(); // body back 5
+						gls_origin(0.f, 0.f, -4.f / 2.f);
+						gls_translate(0.f, 0.f, -4.f / 2.f);
+						gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+						drawRect(6.f, 7.f, 4.f);
 
-						gls_popState(); // tail tip
+							gls_pushState(); // body back 6
+							gls_origin(0.f, 0.f, -4.f / 2.f);
+							gls_translate(0.f, 0.f, -4.f / 2.f);
+							gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+							drawRect(4.f, 5.f, 4.f);
 
-					gls_popState(); // tail
+								gls_pushState(); // tail
+								gls_origin(0.f, 0.f, -4.f / 2.f);
+								gls_translate(0.f, 0.f, -4.f / 2.f);
+								gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+								drawRect(3.f, 3.f, 4.f);
 
-				gls_popState(); // tail start
+									gls_pushState(); // tail 2
+									gls_origin(0.f, 0.f, -4.f / 2.f);
+									gls_translate(0.f, 0.f, -4.f / 2.f);
+									gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+									drawRect(3.f, 3.f, 4.f);
 
-			gls_popState(); // body back back
+										gls_pushState(); // tail 3
+										gls_origin(0.f, 0.f, -4.f / 2.f);
+										gls_translate(0.f, 0.f, -4.f / 2.f);
+										gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+										drawRect(2.f, 2.f, 4.f);
+
+											gls_pushState(); // tail 4
+											gls_origin(0.f, 0.f, -4.f / 2.f);
+											gls_translate(0.f, 0.f, -4.f / 2.f);
+											gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+											drawRect(2.f, 2.f, 4.f);
+
+												gls_pushState(); // tail tip
+												gls_origin(0.f, 0.f, -4.f / 2.f);
+												gls_translate(0.f, 0.f, -4.f / 2.f);
+												gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
+												drawRect(1.f, 1.f, 6.f);
+
+												gls_popState(); // tail tip
+
+											gls_popState(); // tail 4
+
+										gls_popState(); // tail 3
+
+									gls_popState(); // tail 2
+
+								gls_popState(); // tail
+
+							gls_popState(); // body back 6
+
+						gls_popState(); // body back 5
+
+					gls_popState(); // body back 4
+
+				gls_popState(); // body back 3
+
+			gls_popState(); // body back 2
 
 		gls_popState(); // body back
 
