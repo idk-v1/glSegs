@@ -73,7 +73,7 @@ void drawRect(float xs, float ys, float zs)
 }
 
 
-void drawDino(double timer)
+void drawDino(float timer)
 {
 	gls_pushState(); // body
 	gls_colorRGB(0.15f, 0.24f, 0.03f);
@@ -88,21 +88,21 @@ void drawDino(double timer)
 			gls_colorRGB(0.15f, 0.24f, 0.03f);
 			gls_origin(0.f, -1.f, 0.f);
 			gls_translate(0.f, 0.f, 15.f / 2.f);
-			gls_rotate(30.f, 0.f, 0.f);
+			gls_rotate(30.f + sinf(timer / 20.f) * 10.f, sinf(timer / 30.f) * 10.f, 0.f);
 			drawRect(5.f, 8.f, 15.f);
 
 				gls_pushState(); // neck upper
 				gls_colorRGB(0.15f, 0.24f, 0.03f);
 				gls_origin(0.f, 0.f, 15.f / 4.f);
 				gls_translate(0.f, 0.f, 13.f / 2.f);
-				gls_rotate(30.f, 0.f, 0.f);
+				gls_rotate(30.f + sinf(timer / 20.f) * 10.f, 0.f, 0.f);
 				drawRect(5.f, 8.f, 13.f);
 
 					gls_pushState(); // head
 					gls_colorRGB(0.15f, 0.24f, 0.03f);
 					gls_translate(0.f, -7.f / 2.f, 0.f);
 					gls_origin(0.f, 0.f, (13.f + 13.f) / 2.f);
-					gls_rotate(-90.f, 0.f, 0.f);
+					gls_rotate(-90.f + sinf(timer / 20.f) * 10.f, 0.f, 0.f);
 					drawRect(5.f, 7.f, 13.f);
 
 						gls_pushState(); // upper jaw
@@ -155,7 +155,7 @@ void drawDino(double timer)
 		gls_pushState(); // body back
 		gls_colorRGB(0.15f, 0.24f, 0.03f);
 		gls_origin(0.f, 0.f, -(25.f + 6.f) / 2.f);
-		gls_rotate(0.f, sinf(timer / 20.f) * 10.f, 0.f);
+		gls_rotate(sinf(timer / 30.f) * 10.f, sinf(timer / 20.f) * 10.f, 0.f);
 		drawRect(5.f, 12.f, 6.f);
 
 			gls_pushState(); // body back back
@@ -312,7 +312,7 @@ int main(int argc, char** argv)
 
 			gls_begin(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
 
-			drawDino(timer);
+			drawDino((float)timer);
 
 			gls_draw(true);
 			glfwSwapBuffers(window);
