@@ -53,7 +53,7 @@ void gls_init();
 void gls_delete();
 
 void gls_begin(float x, float y, float z, float rx, float ry, float rz);
-void gls_draw(bool clear);
+void gls_draw();
 
 void gls_setViewport(uint32_t width, uint32_t height);
 
@@ -69,6 +69,7 @@ void gls_scale(float x, float y, float z);
 
 void gls_colorRGB(float r, float g, float b);
 void gls_colorHSV(float h, float s, float v);
+gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb);
 
 void gls_vertex(float x, float y, float z);
 gls_Vec3f gls_applyTrans(float x, float y, float z);

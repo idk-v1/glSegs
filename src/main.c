@@ -13,10 +13,10 @@
 
 void drawRect(float xs, float ys, float zs)
 {
-	gls_Vec3f color = gls_getState()->color;
+	gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
 	
 	// left
-	gls_colorRGB(color.x - 0.1f, color.y, color.z);
+	gls_colorHSV(color.x, color.y, color.z - 0.05f);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -25,7 +25,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 
 	// right
-	gls_colorRGB(color.x + 0.1f, color.y, color.z);
+	gls_colorHSV(color.x, color.y, color.z - 0.05f);
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
@@ -34,7 +34,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 
 	// front
-	gls_colorRGB(color.x, color.y, color.z + 0.1f);
+	gls_colorHSV(color.x, color.y, color.z);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -42,8 +42,8 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 
-		// back
-	gls_colorRGB(color.x, color.y, color.z - 0.1f);
+	// back
+	gls_colorHSV(color.x, color.y, color.z);
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
@@ -52,7 +52,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 
 	// bottom
-	gls_colorRGB(color.x, color.y - 0.1f, color.z);
+	gls_colorHSV(color.x, color.y, color.z - 0.1f);
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
@@ -61,7 +61,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 
 	// top
-	gls_colorRGB(color.x, color.y + 0.1f, color.z);
+	gls_colorHSV(color.x, color.y, color.z + 0.1f);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
@@ -69,7 +69,7 @@ void drawRect(float xs, float ys, float zs)
 	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
 
-	gls_colorRGB(color.x, color.y, color.z);
+	gls_colorHSV(color.x, color.y, color.z);
 }
 
 
@@ -236,9 +236,13 @@ int main(int argc, char** argv)
 		deltaTime += time - lastTime;
 		lastTime = time;
 
+		int lastWidth = width;
+		int lastHeight = height;
 		glfwGetFramebufferSize(window, &width, &height);
-		gls_setViewport(width, height);
+		if (lastWidth != width || lastHeight != height)
+			gls_setViewport(width, height);
 
+		// pause state
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) && !escStateLast)
 		{
 			pauseState = !pauseState;
@@ -257,25 +261,18 @@ int main(int argc, char** argv)
 		}
 		escStateLast = glfwGetKey(window, GLFW_KEY_ESCAPE);
 
-		gls_Vec3f accel = { 0 };
 		// movement
+		gls_Vec3f accel = { 0 };
 		int zDir = glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S);
-		if (zDir)
-		{
-			accel.z += cosf(gls_toRad(rot.y)) * zDir * moveSpeed;
-			accel.x += sinf(gls_toRad(rot.y)) * zDir * moveSpeed;
-		}
 		int xDir = glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A);
-		if (xDir)
-		{
-			accel.z -= sinf(gls_toRad(rot.y)) * xDir * moveSpeed;
-			accel.x += cosf(gls_toRad(rot.y)) * xDir * moveSpeed;
-		}
+		accel.z += (cosf(gls_toRad(rot.y)) * zDir - sinf(gls_toRad(rot.y)) * xDir) * moveSpeed;
+		accel.x += (sinf(gls_toRad(rot.y)) * zDir + cosf(gls_toRad(rot.y)) * xDir) * moveSpeed;
 		accel.y += (glfwGetKey(window, GLFW_KEY_SPACE) - 
 			glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) * moveSpeed;
 
 		if (!pauseState)
 		{
+			// update loop
 			while (deltaTime >= 1.f / 60.f)
 			{
 				timer++;
@@ -314,7 +311,7 @@ int main(int argc, char** argv)
 
 			drawDino((float)timer);
 
-			gls_draw(true);
+			gls_draw();
 			glfwSwapBuffers(window);
 		}
 

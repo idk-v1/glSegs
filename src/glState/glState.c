@@ -220,20 +220,68 @@ void gls_colorHSV(float h, float s, float v)
 	gls_getState()->color = vec;
 }
 
+gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb)
+{
+	gls_Vec3f hsv = { 0.f };
+
+	float fCMax = max(max(rgb.x, rgb.y), rgb.z);
+	float fCMin = min(min(rgb.x, rgb.y), rgb.z);
+	float fDelta = fCMax - fCMin;
+
+	if (fDelta > 0.f)
+	{
+		if (fCMax == rgb.x)
+		{
+			hsv.x = 60.f * (fmodf(((rgb.y - rgb.z) / fDelta), 6.f));
+		}
+		else if (fCMax == rgb.y)
+		{
+			hsv.x = 60.f * (((rgb.z - rgb.x) / fDelta) + 2.f);
+		}
+		else if (fCMax == rgb.z)
+		{
+			hsv.x = 60.f * (((rgb.x - rgb.y) / fDelta) + 4.f);
+		}
+
+		if (fCMax > 0.f)
+		{
+			hsv.y = fDelta / fCMax;
+		}
+		else
+		{
+			hsv.y = 0.f;
+		}
+
+		hsv.z = fCMax;
+	}
+	else
+	{
+		hsv.x = 0.f;
+		hsv.y = 0.f;
+		hsv.z = fCMax;
+	}
+
+	if (hsv.x < 0.f)
+		hsv.x += 360.f;
+
+	hsv.x /= 360.f;
+	return hsv;
+}
+
+
 
 void gls_vertex(float x, float y, float z)
 {
-	gls_Vec3f p = gls_applyTrans(x, y, z);
+	gls_Vec3f point = gls_project(gls_applyTrans(x, y, z));
 
-	gls_Vec3f vec = gls_project(p);
-
-	stack_push(&_gls_verts, &vec);
+	stack_push(&_gls_verts, &point);
 
 	stack_push(&_gls_verts, &gls_getState()->color);
 
 	if (_gls_verts.length % 6 == 0)
 	{
 		gls_Vec3f* ptr = stack_index(&_gls_verts, _gls_verts.length - 6);
+		// If any points in triangle are behind camera, remove triangle
 		if (ptr[0].z < 0 || ptr[2].z < 0 || ptr[4].z < 0)
 			_gls_verts.length -= 6;
 	}
@@ -247,25 +295,23 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 	// rotation rotates all points around origin
 	// camera position is removed from points
 
+	// BUGS:
+	//  - Rotating on both axises produces a pringle orbit
+
 	gls_Vec3f point = { x, y, z };
 
 	for (uint64_t i = _gls_state.length - 1; i > 0; i--)
 	{
-		float angleX, angleY, distXZ, distYZ;
-
 		gls_vec3f_add(&point, gls_getStateIndex(i)->translate);
-		gls_vec3f_add(&point, gls_getStateIndex(i)->origin);
-
-		gls_vec3f_sub(&point, gls_getStateIndex(i)->origin);
 		gls_vec3f_mul(&point, gls_getStateIndex(i)->scale);
 
-		angleY = gls_toDeg(atan2f(point.x, point.z)) + gls_getStateIndex(i)->rotate.y;
-		distXZ = sqrtf(powf(point.x, 2) + powf(point.z, 2));
+		float angleY = gls_toDeg(atan2f(point.x, point.z)) + gls_getStateIndex(i)->rotate.y;
+		float distXZ = sqrtf(powf(point.x, 2) + powf(point.z, 2));
 		point.x = distXZ * sinf(gls_toRad(angleY));
 		point.z = distXZ * cosf(gls_toRad(angleY));
 
-		angleX = gls_toDeg(atan2f(point.y, point.z)) + gls_getStateIndex(i)->rotate.x;
-		distYZ = sqrtf(powf(point.y, 2) + powf(point.z, 2));
+		float angleX = gls_toDeg(atan2f(point.y, point.z)) + gls_getStateIndex(i)->rotate.x;
+		float distYZ = sqrtf(powf(point.y, 2) + powf(point.z, 2));
 		point.y = distYZ * sinf(gls_toRad(angleX));
 		point.z = distYZ * cosf(gls_toRad(angleX));
 
@@ -336,7 +382,7 @@ void gls_setViewport(uint32_t width, uint32_t height)
 	_gls_height = height;
 }
 
-void gls_draw(bool clear)
+void gls_draw()
 {
 	glGenBuffers(1, &_gls_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, _gls_vbo);
@@ -378,8 +424,7 @@ void gls_draw(bool clear)
 	float view[4 * 4] = { 0 };
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
 
-	if (clear)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(_gls_vao);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(3 * _gls_verts.length));
