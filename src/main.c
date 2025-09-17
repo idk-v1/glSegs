@@ -380,10 +380,10 @@ int main(int argc, char** argv)
 			//drawDino((float)timer);
 
 			gls_scale(50.f, 50.f, 50.f);
-			gls_rotate(0.f, timer, 0.f);
+			gls_rotate(0.f, (float)timer, 0.f);
 			for (size_t i = 0; i < stegoVerts.length; i++)
 			{
-				//gls_colorHSV(i / 60.f, 1.f, 1.f);
+				gls_colorHSV(i / 3600.f, 1.f, 1.f);
 				gls_vertex(((gls_Vec3f*)stack_index(&stegoVerts, i))->x,
 					((gls_Vec3f*)stack_index(&stegoVerts, i))->y,
 					((gls_Vec3f*)stack_index(&stegoVerts, i))->z);
@@ -393,7 +393,7 @@ int main(int argc, char** argv)
 			gls_origin(250.f, 0.f, 0.f);
 			for (size_t i = 0; i < paraVerts.length; i++)
 			{
-				//gls_colorHSV(i / 60.f, 1.f, 1.f);
+				gls_colorHSV(i / 3600.f, 1.f, 1.f);
 				gls_vertex(((gls_Vec3f*)stack_index(&paraVerts, i))->x,
 					((gls_Vec3f*)stack_index(&paraVerts, i))->y,
 					((gls_Vec3f*)stack_index(&paraVerts, i))->z);
