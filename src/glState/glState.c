@@ -389,7 +389,7 @@ void gls_setViewport(uint32_t width, uint32_t height)
 	_gls_height = height;
 }
 
-void gls_draw()
+void gls_draw(bool clear)
 {
 	glGenBuffers(1, &_gls_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, _gls_vbo);
@@ -412,26 +412,23 @@ void gls_draw()
 
 	glUseProgram(_gls_shader);
 
+	float angle = gls_toRad(90.f);
 	float aspect = (float)_gls_width / (float)_gls_height;
 	float far = 1000.f;
 	float near = 0.1f;
 	float proj[4 * 4] = { 0 };
-	proj[0 + 0 * 4] = 1.f / tanf(gls_toRad(45.f));
-	//proj[0][2] = (r + l) / (r - l);
-	proj[1 + 1 * 4] = 1.f / tanf(gls_toRad(45.f));
-	//proj[1][2] = (t + b) / (t - b);
+	proj[0 + 0 * 4] = 1.f / (aspect * tanf(angle / 2.f));
+	proj[1 + 1 * 4] = 1.f / tanf(angle / 2.f);
 	proj[2 + 2 * 4] = -(far + near) / (far - near);
-	proj[2 + 3 * 4] = (-2 * far * near) / (far - near);
-	proj[3 + 2 * 4] = -1;
-	if (aspect < 1.f)
-		proj[0 + 0 * 4] /= aspect;
-	else
-		proj[1 + 1 * 4] /= aspect;
+	proj[2 + 3 * 4] = -1;
+	proj[3 + 2 * 4] = -(2.f * far * near) / (far - near);
+
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "proj"), 1, true, proj);
 	float view[4 * 4] = { 0 };
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (clear)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(_gls_vao);
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(3 * _gls_verts.length));

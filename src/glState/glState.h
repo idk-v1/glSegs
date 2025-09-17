@@ -53,7 +53,7 @@ void gls_init();
 void gls_delete();
 
 void gls_begin(float x, float y, float z, float rx, float ry, float rz);
-void gls_draw();
+void gls_draw(bool clear);
 
 void gls_setViewport(uint32_t width, uint32_t height);
 

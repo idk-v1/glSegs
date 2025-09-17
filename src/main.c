@@ -383,14 +383,14 @@ int main(int argc, char** argv)
 
 			gls_begin(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
 
-			gls_scale(0.75f, 0.75f, 0.75f);
+			gls_scale(0.1f, 0.1f, 0.1f);
 			gls_rotate(0.f, (float)timer, 0.f);
-
-			for (int x = -2; x <= 2; x++)
-				for (int z = -2; z <= 2; z++)
+			
+			for (int x = -3; x <= 3; x++)
+				for (int z = -3; z <= 3; z++)
 				{
-					gls_colorHSV(timer / 360.f + (x + z) * 0.05f, 1.f, 1.f);
-					gls_origin(150.f * x, 0.f, 150.f * z);
+					gls_colorHSV((float)timer / 360.f + (x + z) * 0.05f, 1.f, 1.f);
+					gls_origin(50.f * x, 50.f, 50.f * z);
 					for (size_t i = 0; i < lpParaVerts.length; i++)
 					{
 						gls_vertex(((gls_Vec3f*)stack_index(&lpParaVerts, i))->x,
@@ -399,7 +399,7 @@ int main(int argc, char** argv)
 					}
 				}
 
-			gls_draw();
+			gls_draw(true);
 			glfwSwapBuffers(window);
 		}
 
