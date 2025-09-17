@@ -274,19 +274,11 @@ gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb)
 
 void gls_vertex(float x, float y, float z)
 {
-	gls_Vec3f point = gls_project(gls_applyTrans(x, y, z));
+	gls_Vec3f point = gls_applyTrans(x, y, z);
 
 	stack_push(&_gls_verts, &point);
 
 	stack_push(&_gls_verts, &gls_getState()->color);
-
-	if (_gls_verts.length % 6 == 0)
-	{
-		gls_Vec3f* ptr = stack_index(&_gls_verts, _gls_verts.length - 6);
-		// If any points in triangle are behind camera, remove triangle
-		if (ptr[0].z < 0 || ptr[2].z < 0 || ptr[4].z < 0)
-			_gls_verts.length -= 6;
-	}
 }
 
 gls_Vec3f gls_applyTrans(float x, float y, float z)
@@ -323,28 +315,6 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 	gls_vec3f_sub(&point, _gls_camera.pos);
 
 	return point;
-}
-
-gls_Vec3f gls_project(gls_Vec3f p)
-{
-	gls_Vec3f s = {
-		sinf(gls_toRad(_gls_camera.rot.x)),
-		sinf(gls_toRad(_gls_camera.rot.y)),
-		sinf(gls_toRad(_gls_camera.rot.z)) };
-	gls_Vec3f c = {
-		cosf(gls_toRad(_gls_camera.rot.x)),
-		cosf(gls_toRad(_gls_camera.rot.y)),
-		cosf(gls_toRad(_gls_camera.rot.z)) };
-	gls_Vec3f d = {
-		c.y * (s.z * p.y + c.z * p.x) - s.y * p.z,
-		s.x * (c.y * p.z + s.y * (s.z * p.y + c.z * p.x)) + c.x * (c.z * p.y - s.z * p.x),
-		c.x * (c.y * p.z + s.y * (s.z * p.y + c.z * p.x)) - s.x * (c.z * p.y - s.z * p.x) };
-
-	float bx = d.x * 1000.f / (d.z * _gls_width);
-	float by = d.y * 1000.f / (d.z * _gls_height);
-
-	return gls_vec3f(bx, by, d.z / 1000.f);
-
 }
 
 void gls_setWireframe(bool state)
@@ -412,7 +382,7 @@ void gls_draw(bool clear)
 
 	glUseProgram(_gls_shader);
 
-	float angle = gls_toRad(90.f);
+	float angle = gls_toRad(45.f);
 	float aspect = (float)_gls_width / (float)_gls_height;
 	float far = 1000.f;
 	float near = 0.1f;

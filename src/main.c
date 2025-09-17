@@ -334,7 +334,7 @@ int main(int argc, char** argv)
 
 		// movement
 		gls_Vec3f accel = { 0 };
-		int zDir = glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S);
+		int zDir = glfwGetKey(window, GLFW_KEY_S) - glfwGetKey(window, GLFW_KEY_W);
 		int xDir = glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A);
 		accel.z += (cosf(gls_toRad(rot.y)) * zDir - sinf(gls_toRad(rot.y)) * xDir) * moveSpeed;
 		accel.x += (sinf(gls_toRad(rot.y)) * zDir + cosf(gls_toRad(rot.y)) * xDir) * moveSpeed;
