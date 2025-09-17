@@ -11,6 +11,8 @@
 
 #include "glState/glState.h"
 
+#include "objReader/objReader.h"
+
 void drawRect(float xs, float ys, float zs)
 {
 	gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
@@ -77,7 +79,7 @@ void drawDino(float timer)
 {
 	gls_pushState(); // body
 	gls_colorHSV(0.20f, 0.65f, 0.18f);
-	drawRect(13.f, 17.f, 25.f);
+	drawRect(13.f, 13.f, 25.f);
 
 		gls_pushState(); // body front
 		gls_origin(0.f, 0.f, (25.f + 5.f) / 2.f);
@@ -143,11 +145,35 @@ void drawDino(float timer)
 
 		gls_popState(); // body front
 
+		gls_pushState(); // body top
+		gls_origin(0.f, 13.f / 2.f, 0.f);
+		gls_translate(0.f, 2.f / 2.f, 0.f);
+		drawRect(9.f, 2.f, 25.f);
+		gls_popState(); // body top
+
+		gls_pushState(); // body bottom
+		gls_origin(0.f, -13.f / 2.f, 0.f);
+		gls_translate(0.f, -2.f / 2.f, 0.f);
+		drawRect(9.f, 2.f, 25.f);
+		gls_popState(); // body bottom
+
 		gls_pushState(); // body back
 		gls_origin(0.f, 0.f, -25.f/ 2.f);
 		gls_translate(0.f, 0.f, -3.f / 2.f);
 		gls_rotate(cosf(timer / 20.f), sinf(timer / 20.f) * 10.f, 0.f);
-		drawRect(12.f, 15.f, 3.f);
+		drawRect(11.f, 11.f, 3.f);
+
+			gls_pushState(); // body back top
+			gls_origin(0.f, 11.f / 2.f, 0.f);
+			gls_translate(0.f, 2.f / 2.f, 0.f);
+			drawRect(8.f, 2.f, 3.f);
+			gls_popState(); // body back top
+
+			gls_pushState(); // body back bottom
+			gls_origin(0.f, -11.f / 2.f, 0.f);
+			gls_translate(0.f, -2.f / 2.f, 0.f);
+			drawRect(8.f, 2.f, 3.f);
+			gls_popState(); // body back bottom
 
 			gls_pushState(); // body back 2
 			gls_origin(0.f, 0.f, -3.f / 2.f);
@@ -254,6 +280,9 @@ int main(int argc, char** argv)
 
 	gls_init();
 
+	gls_Stack stegoVerts = obj_readVerts("para/stegosaurus.obj");
+	gls_Stack paraVerts = obj_readVerts("para/parasaur.obj");
+
 	gls_Vec3f pos = { 0 };
 	gls_Vec3f vel = { 0 };
 	gls_Vec3f rot = { 0 };
@@ -348,7 +377,27 @@ int main(int argc, char** argv)
 
 			gls_begin(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
 
-			drawDino((float)timer);
+			//drawDino((float)timer);
+
+			gls_scale(50.f, 50.f, 50.f);
+			gls_rotate(0.f, timer, 0.f);
+			for (size_t i = 0; i < stegoVerts.length; i++)
+			{
+				//gls_colorHSV(i / 60.f, 1.f, 1.f);
+				gls_vertex(((gls_Vec3f*)stack_index(&stegoVerts, i))->x,
+					((gls_Vec3f*)stack_index(&stegoVerts, i))->y,
+					((gls_Vec3f*)stack_index(&stegoVerts, i))->z);
+			}
+
+
+			gls_origin(250.f, 0.f, 0.f);
+			for (size_t i = 0; i < paraVerts.length; i++)
+			{
+				//gls_colorHSV(i / 60.f, 1.f, 1.f);
+				gls_vertex(((gls_Vec3f*)stack_index(&paraVerts, i))->x,
+					((gls_Vec3f*)stack_index(&paraVerts, i))->y,
+					((gls_Vec3f*)stack_index(&paraVerts, i))->z);
+			}
 
 			gls_draw();
 			glfwSwapBuffers(window);
@@ -359,6 +408,9 @@ int main(int argc, char** argv)
 		glfwSleep(1.f / 1000.f);
 	}
 	glfwDestroyWindow(window);
+
+	stack_free(&stegoVerts);
+	stack_free(&paraVerts);
 
 	glfwTerminate();
 	return 0;

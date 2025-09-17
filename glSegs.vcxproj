@@ -145,6 +145,7 @@
     <ClCompile Include="src\glState\glState.c" />
     <ClCompile Include="src\glState\stack.c" />
     <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\objReader\objReader.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad\include\glad\glad.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="glfw\include\GLFW\util\sleep.h" />
     <ClInclude Include="src\glState\glState.h" />
     <ClInclude Include="src\glState\stack.h" />
+    <ClInclude Include="src\objReader\objReader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\glState\shader.frag" />

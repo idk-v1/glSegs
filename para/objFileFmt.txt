@@ -1,0 +1,10 @@
+# = comment
+g = group (name opt)
+mtllib = material (name)
+v = vertex (x, y, z, w opt)
+vt = texture coordinate (u, v, w opt)
+s = smooth shading (off, 1, 2, 3)
+f = face (vertex index) x3
+f = face (vertex index/texture index) x3
+f = face (vertex index/texture index/normal index) x3
+f = face (vertex index//normal index) x3

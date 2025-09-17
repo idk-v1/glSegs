@@ -73,6 +73,7 @@ void gls_init()
 	stack_init(&_gls_verts, sizeof(gls_Vec3f), 128);
 
 	_gls_state.length = 1;
+	gls_getStateIndex(0)->color = gls_vec3f(1.f, 1.f, 1.f);
 	gls_pushState();
 
 	glEnable(GL_CULL_FACE);

@@ -33,6 +33,9 @@
     <ClCompile Include="glfw\include\GLFW\util\win32_sleep.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objReader\objReader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad\include\glad\glad.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="glfw\include\GLFW\util\sleep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objReader\objReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
