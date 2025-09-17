@@ -77,6 +77,7 @@ void gls_init()
 	gls_pushState();
 
 	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 	glEnable(GL_DEPTH_TEST);
 
 	static const char* vertShaderSrc =
@@ -358,6 +359,11 @@ void gls_setWireframe(bool state)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDisable(GL_POLYGON_OFFSET_LINE);
 	}
+}
+
+void gls_setFrontFace(bool ccw)
+{
+	glFrontFace(ccw ? GL_CCW : GL_CW);
 }
 
 void gls_popState()

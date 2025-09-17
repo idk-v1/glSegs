@@ -76,3 +76,4 @@ gls_Vec3f gls_applyTrans(float x, float y, float z);
 gls_Vec3f gls_project(gls_Vec3f p);
 
 void gls_setWireframe(bool state);
+void gls_setFrontFace(bool ccw);

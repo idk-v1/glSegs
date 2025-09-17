@@ -19,57 +19,57 @@ void drawRect(float xs, float ys, float zs)
 	
 	// left
 	gls_colorHSV(color.x, color.y, color.z - 0.0125f);
-	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
 
 	// right
 	gls_colorHSV(color.x, color.y, color.z - 0.0125f);
-	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
 
 	// front
 	gls_colorHSV(color.x, color.y, color.z);
-	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
 
 	// back
 	gls_colorHSV(color.x, color.y, color.z);
-	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 
 	// bottom
 	gls_colorHSV(color.x, color.y, color.z - 0.1f);
-	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(+0.5f * xs, -0.5f * ys, +0.5f * zs);
-	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
-	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
-	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, -0.5f * ys, -0.5f * zs);
+	gls_vertex(+0.5f * xs, -0.5f * ys, -0.5f * zs);
 
 	// top
 	gls_colorHSV(color.x, color.y, color.z + 0.1f);
-	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
-	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
 	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(-0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, +0.5f * zs);
+	gls_vertex(+0.5f * xs, +0.5f * ys, -0.5f * zs);
 
 	gls_colorHSV(color.x, color.y, color.z);
 }
@@ -279,9 +279,9 @@ int main(int argc, char** argv)
 	gls_setViewport(width, height);
 
 	gls_init();
+	gls_setFrontFace(false);
 
-	gls_Stack stegoVerts = obj_readVerts("para/stegosaurus.obj");
-	gls_Stack paraVerts = obj_readVerts("para/parasaur.obj");
+	gls_Stack lpParaVerts = obj_readVerts("para/lowpoly_parasaur.obj");
 
 	gls_Vec3f pos = { 0 };
 	gls_Vec3f vel = { 0 };
@@ -292,6 +292,9 @@ int main(int argc, char** argv)
 	double lastTime = glfwGetTime();
 	double deltaTime = 0;
 	double timer = 0;
+
+	bool tabLast = false;
+	bool wireframe = false;
 
 	bool pauseState = false;
 	bool escStateLast = false;
@@ -338,6 +341,14 @@ int main(int argc, char** argv)
 		accel.y += (glfwGetKey(window, GLFW_KEY_SPACE) - 
 			glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) * moveSpeed;
 
+		bool tab = glfwGetKey(window, GLFW_KEY_TAB);
+		if (tab && !tabLast)
+		{
+			wireframe = !wireframe;
+			gls_setWireframe(wireframe);
+		}
+		tabLast = tab;
+
 		if (!pauseState)
 		{
 			// update loop
@@ -350,11 +361,6 @@ int main(int argc, char** argv)
 				gls_vec3f_add(&vel, accel);
 				gls_vec3f_mul(&vel, gls_vec3f(0.8f, 0.8f, 0.8f));
 				gls_vec3f_add(&pos, vel);
-
-				if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
-					gls_setWireframe(true);
-				else
-					gls_setWireframe(false);
 			}
 
 			double mouseX, mouseY;
@@ -377,27 +383,21 @@ int main(int argc, char** argv)
 
 			gls_begin(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
 
-			//drawDino((float)timer);
-
-			gls_scale(50.f, 50.f, 50.f);
+			gls_scale(0.75f, 0.75f, 0.75f);
 			gls_rotate(0.f, (float)timer, 0.f);
-			for (size_t i = 0; i < stegoVerts.length; i++)
-			{
-				gls_colorHSV(i / 3600.f, 1.f, 1.f);
-				gls_vertex(((gls_Vec3f*)stack_index(&stegoVerts, i))->x,
-					((gls_Vec3f*)stack_index(&stegoVerts, i))->y,
-					((gls_Vec3f*)stack_index(&stegoVerts, i))->z);
-			}
 
-
-			gls_origin(250.f, 0.f, 0.f);
-			for (size_t i = 0; i < paraVerts.length; i++)
-			{
-				gls_colorHSV(i / 3600.f, 1.f, 1.f);
-				gls_vertex(((gls_Vec3f*)stack_index(&paraVerts, i))->x,
-					((gls_Vec3f*)stack_index(&paraVerts, i))->y,
-					((gls_Vec3f*)stack_index(&paraVerts, i))->z);
-			}
+			for (int x = -2; x <= 2; x++)
+				for (int z = -2; z <= 2; z++)
+				{
+					gls_colorHSV(timer / 360.f + (x + z) * 0.05f, 1.f, 1.f);
+					gls_origin(150.f * x, 0.f, 150.f * z);
+					for (size_t i = 0; i < lpParaVerts.length; i++)
+					{
+						gls_vertex(((gls_Vec3f*)stack_index(&lpParaVerts, i))->x,
+							((gls_Vec3f*)stack_index(&lpParaVerts, i))->y,
+							((gls_Vec3f*)stack_index(&lpParaVerts, i))->z);
+					}
+				}
 
 			gls_draw();
 			glfwSwapBuffers(window);
@@ -405,12 +405,11 @@ int main(int argc, char** argv)
 
 		glfwPollEvents();
 
-		glfwSleep(1.f / 1000.f);
+		//glfwSleep(1.f / 1000.f);
 	}
 	glfwDestroyWindow(window);
 
-	stack_free(&stegoVerts);
-	stack_free(&paraVerts);
+	stack_free(&lpParaVerts);
 
 	glfwTerminate();
 	return 0;
