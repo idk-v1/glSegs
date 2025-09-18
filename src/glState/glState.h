@@ -73,6 +73,9 @@ gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb);
 
 void gls_vertex(float x, float y, float z);
 gls_Vec3f gls_applyTrans(float x, float y, float z);
+gls_Vec3f gls_normalize(gls_Vec3f vec);
+gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y);
+float gls_dot(gls_Vec3f x, gls_Vec3f y);
 
 void gls_setWireframe(bool state);
 void gls_setFrontFace(bool ccw);

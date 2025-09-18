@@ -6,6 +6,6 @@
 "uniform mat4 view;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = proj * vec4(aPos, 1);\n"
+"   gl_Position = proj * view * vec4(aPos, 1);\n"
 "   pixColor = vec4(aColor, 1);\n"
 "}";

@@ -317,6 +317,30 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 	return point;
 }
 
+gls_Vec3f gls_normalize(gls_Vec3f vec)
+{
+	float dist = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	vec.x /= dist;
+	vec.y /= dist;
+	vec.z /= dist;
+	return vec;
+}
+
+gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y)
+{
+	gls_Vec3f vec = { 0 };
+	vec.x = x.y * y.z - y.y * x.z;
+	vec.y = x.z * y.x - y.z * x.x;
+	vec.z = x.x * y.y - y.x * x.y;
+	return vec;
+}
+
+float gls_dot(gls_Vec3f x, gls_Vec3f y)
+{
+	gls_vec3f_mul(&x, y);
+	return x.x + x.y + x.z;
+}
+
 void gls_setWireframe(bool state)
 {
 	if (state)
@@ -394,7 +418,31 @@ void gls_draw(bool clear)
 	proj[3 + 2 * 4] = -(2.f * far * near) / (far - near);
 
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "proj"), 1, true, proj);
+
+	gls_Vec3f up = { 0.f, 1.f, 0.f };
+	gls_Vec3f lookat = { 0.f, 0.f, -1.f }; // make from camera rotations
+	gls_Vec3f s = gls_normalize(gls_cross(lookat, up));
+	gls_Vec3f u = gls_cross(s, lookat);
 	float view[4 * 4] = { 0 };
+	view[0 + 0 * 4] = s.x;
+	view[1 + 0 * 4] = s.y;
+	view[2 + 0 * 4] = s.z;
+	view[0 + 1 * 4] = u.x;
+	view[1 + 1 * 4] = u.y;
+	view[2 + 1 * 4] = u.z;
+	view[0 + 2 * 4] = -lookat.x;
+	view[1 + 2 * 4] = -lookat.y;
+	view[2 + 2 * 4] = -lookat.z;
+	view[3 + 0 * 4] = -gls_dot(s, lookat);
+	view[3 + 1 * 4] = -gls_dot(u, lookat);
+	view[3 + 2 * 4] = gls_dot(lookat, lookat);
+	view[3 + 3 * 4] = 1.f;
+
+	//view[0 + 0 * 4] = 1.f;
+	//view[1 + 1 * 4] = 1.f;
+	//view[2 + 2 * 4] = 1.f;
+	//view[3 + 3 * 4] = 1.f;
+
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
 
 	if (clear)

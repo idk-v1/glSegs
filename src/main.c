@@ -279,7 +279,7 @@ int main(int argc, char** argv)
 	gls_setViewport(width, height);
 
 	gls_init();
-	gls_setFrontFace(false);
+	//gls_setFrontFace(false);
 
 	gls_Stack lpParaVerts = obj_readVerts("para/lowpoly_parasaur.obj");
 
@@ -389,10 +389,10 @@ int main(int argc, char** argv)
 			for (int x = -3; x <= 3; x++)
 				for (int z = -3; z <= 3; z++)
 				{
-					gls_colorHSV((float)timer / 360.f + (x + z) * 0.05f, 1.f, 1.f);
-					gls_origin(50.f * x, 50.f, 50.f * z);
+					gls_origin(50.f * x, 0.f, 50.f * z);
 					for (size_t i = 0; i < lpParaVerts.length; i++)
 					{
+						gls_colorHSV((float)timer / 360.f + i * 0.1f, 1.f, 1.f);
 						gls_vertex(((gls_Vec3f*)stack_index(&lpParaVerts, i))->x,
 							((gls_Vec3f*)stack_index(&lpParaVerts, i))->y,
 							((gls_Vec3f*)stack_index(&lpParaVerts, i))->z);
