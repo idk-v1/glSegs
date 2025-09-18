@@ -8,6 +8,9 @@ GLuint _gls_vbo = 0;
 uint32_t _gls_width = 0;
 uint32_t _gls_height = 0;
 GLuint _gls_shader = 0;
+float _gls_fov = 75.f;
+float _gls_near = 0.1f;
+float _gls_far = 1000.f;
 
 
 void gls_vec3f_add(gls_Vec3f* left, gls_Vec3f right)
@@ -383,6 +386,17 @@ void gls_setViewport(uint32_t width, uint32_t height)
 	_gls_height = height;
 }
 
+void gls_setFOV(float fov)
+{
+	_gls_fov = fov;
+}
+
+void gls_setNearFar(float near, float far)
+{
+	_gls_near = near;
+	_gls_far = far;
+}
+
 void gls_draw(bool clear)
 {
 	glGenBuffers(1, &_gls_vbo);
@@ -406,21 +420,21 @@ void gls_draw(bool clear)
 
 	glUseProgram(_gls_shader);
 
-	float angle = gls_toRad(45.f);
 	float aspect = (float)_gls_width / (float)_gls_height;
-	float far = 10000.f;
-	float near = 0.1f;
 	float proj[4 * 4] = { 0 };
-	proj[0 + 0 * 4] = 1.f / (aspect * tanf(angle / 2.f));
-	proj[1 + 1 * 4] = 1.f / tanf(angle / 2.f);
-	proj[2 + 2 * 4] = -(far + near) / (far - near);
+	proj[0 + 0 * 4] = 1.f / (aspect * tanf(gls_toRad(_gls_fov) / 2.f));
+	proj[1 + 1 * 4] = 1.f / tanf(gls_toRad(_gls_fov) / 2.f);
+	proj[2 + 2 * 4] = -(_gls_far + _gls_near) / (_gls_far - _gls_near);
 	proj[2 + 3 * 4] = -1;
-	proj[3 + 2 * 4] = -(2.f * far * near) / (far - near);
+	proj[3 + 2 * 4] = -(2.f * _gls_far * _gls_near) / (_gls_far - _gls_near);
 
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "proj"), 1, true, proj);
 
 	gls_Vec3f up = { 0.f, 1.f, 0.f };
-	gls_Vec3f lookat = { 0.f, 0.f, -1.f }; // make from camera rotations
+	gls_Vec3f lookat = gls_normalize(gls_vec3f(
+		-sinf(gls_toRad(_gls_camera.rot.y)), 
+		-sinf(gls_toRad(_gls_camera.rot.x)),  // BUG: sin shouldnt be used here
+		-cosf(gls_toRad(_gls_camera.rot.y))));
 	gls_Vec3f s = gls_normalize(gls_cross(lookat, up));
 	gls_Vec3f u = gls_cross(s, lookat);
 	float view[4 * 4] = { 0 };

@@ -279,7 +279,8 @@ int main(int argc, char** argv)
 	gls_setViewport(width, height);
 
 	gls_init();
-	//gls_setFrontFace(false);
+	gls_setNearFar(0.1f, 10000.f);
+	gls_setFOV(90.f);
 
 	gls_Stack lpParaVerts = obj_readVerts("para/lowpoly_parasaur.obj");
 
@@ -295,6 +296,8 @@ int main(int argc, char** argv)
 
 	bool tabLast = false;
 	bool wireframe = false;
+
+	float fov = 90.f;
 
 	bool pauseState = false;
 	bool escStateLast = false;
@@ -361,11 +364,27 @@ int main(int argc, char** argv)
 				gls_vec3f_add(&vel, accel);
 				gls_vec3f_mul(&vel, gls_vec3f(0.8f, 0.8f, 0.8f));
 				gls_vec3f_add(&pos, vel);
+
+				if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT))
+				{
+					if (fov > 10.f)
+						fov -= 1.f;
+					if (fov < 10.f)
+						fov = 10.f;
+				}
+				else
+				{
+					if (fov < 90.f)
+						fov += 1.f;
+					if (fov > 90.f)
+						fov = 90.f;
+				}
+				gls_setFOV(fov);
 			}
 
 			double mouseX, mouseY;
 			glfwGetCursorPos(window, &mouseX, &mouseY);
-			rot.y += (float)(mouseX - width / 2.f) * lookSpeed;
+			rot.y -= (float)(mouseX - width / 2.f) * lookSpeed;
 			rot.x += (float)(mouseY - height / 2.f) * lookSpeed;
 			glfwSetCursorPos(window, width / 2.f, height / 2.f);
 
@@ -386,8 +405,8 @@ int main(int argc, char** argv)
 			gls_scale(0.1f, 0.1f, 0.1f);
 			gls_rotate(0.f, (float)timer, 0.f);
 			
-			for (int x = -3; x <= 3; x++)
-				for (int z = -3; z <= 3; z++)
+			for (int x = -5; x <= 5; x++)
+				for (int z = -5; z <= 5; z++)
 				{
 					gls_origin(50.f * x, 0.f, 50.f * z);
 					for (size_t i = 0; i < lpParaVerts.length; i++)

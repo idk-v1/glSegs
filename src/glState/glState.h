@@ -37,6 +37,9 @@ extern GLuint _gls_vbo;
 extern uint32_t _gls_width;
 extern uint32_t _gls_height;
 extern GLuint _gls_shader;
+extern float _gls_fov;
+extern float _gls_near;
+extern float _gls_far;
 
 void gls_vec3f_add(gls_Vec3f* left, gls_Vec3f right);
 void gls_vec3f_sub(gls_Vec3f* left, gls_Vec3f right);
@@ -56,6 +59,8 @@ void gls_begin(float x, float y, float z, float rx, float ry, float rz);
 void gls_draw(bool clear);
 
 void gls_setViewport(uint32_t width, uint32_t height);
+void gls_setFOV(float fov);
+void gls_setNearFar(float near, float far);
 
 void gls_pushState();
 void gls_popState();
