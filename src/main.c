@@ -283,6 +283,7 @@ int main(int argc, char** argv)
 	gls_setFOV(90.f);
 
 	gls_Stack lpParaVerts = obj_readVerts("para/lowpoly_parasaur.obj");
+	gls_Stack penis = obj_readVerts("para/penis.obj");
 
 	gls_Vec3f pos = { 0 };
 	gls_Vec3f vel = { 0 };
@@ -403,12 +404,13 @@ int main(int argc, char** argv)
 			gls_begin(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
 
 			gls_scale(0.1f, 0.1f, 0.1f);
-			gls_rotate(0.f, (float)timer, 0.f);
+			//gls_rotate(0.f, (float)timer, 0.f);
 			
-			for (int x = -5; x <= 5; x++)
-				for (int z = -5; z <= 5; z++)
+			for (int x = -0; x <= 0; x++)
+				for (int z = -0; z <= 0; z++)
 				{
-					gls_origin(50.f * x, 0.f, 50.f * z);
+					gls_pushState();
+					gls_origin(300.f * x, 0.f, 300.f * z);
 					for (size_t i = 0; i < lpParaVerts.length; i++)
 					{
 						gls_colorHSV((float)timer / 360.f + i * 0.1f, 1.f, 1.f);
@@ -416,6 +418,20 @@ int main(int argc, char** argv)
 							((gls_Vec3f*)stack_index(&lpParaVerts, i))->y,
 							((gls_Vec3f*)stack_index(&lpParaVerts, i))->z);
 					}
+					gls_rotate(0.f, 90.f, 0.f);
+					gls_pushState();
+					gls_rotate(100.f + sinf(gls_toRad((float)timer * 20.f)) * 10.f, 0.f, 0.f);
+					gls_origin(0.f, -50.f, 0.f);
+					gls_translate(0.f, 120.f, 0.f);
+					for (size_t i = 0; i < penis.length; i++)
+					{
+						gls_colorHSV((float)timer / 360.f + i * 0.1f, 1.f, 1.f);
+						gls_vertex(((gls_Vec3f*)stack_index(&penis, i))->x,
+							((gls_Vec3f*)stack_index(&penis, i))->y,
+							((gls_Vec3f*)stack_index(&penis, i))->z);
+					}
+					gls_popState();
+					gls_popState();
 				}
 
 			gls_draw(true);
@@ -428,6 +444,7 @@ int main(int argc, char** argv)
 	}
 	glfwDestroyWindow(window);
 
+	stack_free(&penis);
 	stack_free(&lpParaVerts);
 
 	glfwTerminate();
