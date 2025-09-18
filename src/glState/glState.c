@@ -41,7 +41,6 @@ void gls_vec3f_div(gls_Vec3f* left, gls_Vec3f right)
 	left->z /= right.z;
 }
 
-
 gls_Vec3f gls_vec3f(float x, float y, float z)
 {
 	gls_Vec3f vec;
@@ -50,6 +49,7 @@ gls_Vec3f gls_vec3f(float x, float y, float z)
 	vec.z = z;
 	return vec;
 }
+
 
 float gls_toRad(float deg)
 {
@@ -129,6 +129,7 @@ void gls_delete()
 		glDeleteProgram(_gls_shader);
 }
 
+
 void gls_begin(float x, float y, float z, float rx, float ry, float rz)
 {
 	if (_gls_vao)
@@ -151,6 +152,54 @@ void gls_pushState()
 	state.scale = gls_vec3f(1, 1, 1);
 	state.color = gls_getState()->color;
 	stack_push(&_gls_state, &state);
+}
+
+void gls_popState()
+{
+	if (_gls_state.length > 1)
+		stack_pop(&_gls_state);
+}
+
+gls_State* gls_getState()
+{
+	return stack_last(&_gls_state);
+}
+
+gls_State* gls_getStateIndex(uint64_t index)
+{
+	return stack_index(&_gls_state, index);
+}
+
+void gls_draw(bool clear)
+{
+	glGenBuffers(1, &_gls_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, _gls_vbo);
+	glBufferData(GL_ARRAY_BUFFER,
+		_gls_verts.length * _gls_verts.elemSize,
+		_gls_verts.data, GL_DYNAMIC_DRAW);
+
+	glGenVertexArrays(1, &_gls_vao);
+	glBindVertexArray(_gls_vao);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(gls_Vec3f), 0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(gls_Vec3f), (void*)sizeof(gls_Vec3f));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+
+	glUseProgram(_gls_shader);
+
+	gls_setMatrix();
+
+	if (clear)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBindVertexArray(_gls_vao);
+	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(3 * _gls_verts.length));
 }
 
 
@@ -273,8 +322,6 @@ gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb)
 	return hsv;
 }
 
-
-
 void gls_vertex(float x, float y, float z)
 {
 	gls_Vec3f point = gls_applyTrans(x, y, z);
@@ -283,6 +330,7 @@ void gls_vertex(float x, float y, float z)
 
 	stack_push(&_gls_verts, &gls_getState()->color);
 }
+
 
 gls_Vec3f gls_applyTrans(float x, float y, float z)
 {
@@ -320,106 +368,8 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 	return point;
 }
 
-gls_Vec3f gls_normalize(gls_Vec3f vec)
+void gls_setMatrix()
 {
-	float dist = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-	vec.x /= dist;
-	vec.y /= dist;
-	vec.z /= dist;
-	return vec;
-}
-
-gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y)
-{
-	gls_Vec3f vec = { 0 };
-	vec.x = x.y * y.z - y.y * x.z;
-	vec.y = x.z * y.x - y.z * x.x;
-	vec.z = x.x * y.y - y.x * x.y;
-	return vec;
-}
-
-float gls_dot(gls_Vec3f x, gls_Vec3f y)
-{
-	gls_vec3f_mul(&x, y);
-	return x.x + x.y + x.z;
-}
-
-void gls_setWireframe(bool state)
-{
-	if (state)
-	{
-		glEnable(GL_POLYGON_OFFSET_LINE);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDisable(GL_POLYGON_OFFSET_LINE);
-	}
-}
-
-void gls_setFrontFace(bool ccw)
-{
-	glFrontFace(ccw ? GL_CCW : GL_CW);
-}
-
-void gls_popState()
-{
-	if (_gls_state.length > 1)
-		stack_pop(&_gls_state);
-}
-
-gls_State* gls_getState()
-{
-	return stack_last(&_gls_state);
-}
-
-gls_State* gls_getStateIndex(uint64_t index)
-{
-	return stack_index(&_gls_state, index);
-}
-
-void gls_setViewport(uint32_t width, uint32_t height)
-{
-	glViewport(0, 0, width, height);
-	_gls_width = width;
-	_gls_height = height;
-}
-
-void gls_setFOV(float fov)
-{
-	_gls_fov = fov;
-}
-
-void gls_setNearFar(float near, float far)
-{
-	_gls_near = near;
-	_gls_far = far;
-}
-
-void gls_draw(bool clear)
-{
-	glGenBuffers(1, &_gls_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, _gls_vbo);
-	glBufferData(GL_ARRAY_BUFFER,
-		_gls_verts.length * _gls_verts.elemSize,
-		_gls_verts.data, GL_DYNAMIC_DRAW);
-
-	glGenVertexArrays(1, &_gls_vao);
-	glBindVertexArray(_gls_vao);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(gls_Vec3f), 0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(gls_Vec3f), (void*)sizeof(gls_Vec3f));
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-
-	glUseProgram(_gls_shader);
-
 	float aspect = (float)_gls_width / (float)_gls_height;
 	float proj[4 * 4] = { 0 };
 	proj[0 + 0 * 4] = 1.f / (aspect * tanf(gls_toRad(_gls_fov) / 2.f));
@@ -453,10 +403,66 @@ void gls_draw(bool clear)
 	view[3 + 3 * 4] = 1.f;
 
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
+}
 
-	if (clear)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+gls_Vec3f gls_normalize(gls_Vec3f vec)
+{
+	float dist = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	vec.x /= dist;
+	vec.y /= dist;
+	vec.z /= dist;
+	return vec;
+}
 
-	glBindVertexArray(_gls_vao);
-	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)(3 * _gls_verts.length));
+gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y)
+{
+	gls_Vec3f vec = { 0 };
+	vec.x = x.y * y.z - y.y * x.z;
+	vec.y = x.z * y.x - y.z * x.x;
+	vec.z = x.x * y.y - y.x * x.y;
+	return vec;
+}
+
+float gls_dot(gls_Vec3f x, gls_Vec3f y)
+{
+	gls_vec3f_mul(&x, y);
+	return x.x + x.y + x.z;
+}
+
+
+void gls_setWireframe(bool state)
+{
+	if (state)
+	{
+		glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDisable(GL_POLYGON_OFFSET_LINE);
+	}
+}
+
+void gls_setFrontFace(bool ccw)
+{
+	glFrontFace(ccw ? GL_CCW : GL_CW);
+}
+
+void gls_setViewport(uint32_t width, uint32_t height)
+{
+	glViewport(0, 0, width, height);
+	_gls_width = width;
+	_gls_height = height;
+}
+
+void gls_setFOV(float fov)
+{
+	_gls_fov = fov;
+}
+
+void gls_setNearFar(float near, float far)
+{
+	_gls_near = near;
+	_gls_far = far;
 }
