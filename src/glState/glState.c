@@ -432,9 +432,9 @@ void gls_draw(bool clear)
 
 	gls_Vec3f up = { 0.f, 1.f, 0.f };
 	gls_Vec3f lookat = gls_normalize(gls_vec3f(
-		-sinf(gls_toRad(_gls_camera.rot.y)), 
-		-sinf(gls_toRad(_gls_camera.rot.x)),  // BUG: sin shouldnt be used here
-		-cosf(gls_toRad(_gls_camera.rot.y))));
+		-sinf(gls_toRad(_gls_camera.rot.y)) * cosf(gls_toRad(_gls_camera.rot.x)),
+		sinf(gls_toRad(_gls_camera.rot.x)),
+		-cosf(gls_toRad(_gls_camera.rot.y)) * cosf(gls_toRad(_gls_camera.rot.x))));
 	gls_Vec3f s = gls_normalize(gls_cross(lookat, up));
 	gls_Vec3f u = gls_cross(s, lookat);
 	float view[4 * 4] = { 0 };

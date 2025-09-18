@@ -386,10 +386,13 @@ int main(int argc, char** argv)
 			double mouseX, mouseY;
 			glfwGetCursorPos(window, &mouseX, &mouseY);
 			rot.y -= (float)(mouseX - width / 2.f) * lookSpeed;
-			rot.x += (float)(mouseY - height / 2.f) * lookSpeed;
+			rot.x += (float)(height / 2.f - mouseY) * lookSpeed;
 			glfwSetCursorPos(window, width / 2.f, height / 2.f);
 
-			rot.x = gls_wrapDeg(rot.x);
+			if (rot.x > 90.f)
+				rot.x = 90.f;
+			if (rot.x < -90.f)
+				rot.x = -90.f;
 			rot.y = gls_wrapDeg(rot.y);
 			rot.z = gls_wrapDeg(rot.z);
 
