@@ -45,7 +45,6 @@ void gls_vec3f_add(gls_Vec3f* left, gls_Vec3f right);
 void gls_vec3f_sub(gls_Vec3f* left, gls_Vec3f right);
 void gls_vec3f_mul(gls_Vec3f* left, gls_Vec3f right);
 void gls_vec3f_div(gls_Vec3f* left, gls_Vec3f right);
-
 gls_Vec3f gls_vec3f(float x, float y, float z);
 
 float gls_toRad(float deg);
@@ -56,31 +55,29 @@ void gls_init();
 void gls_delete();
 
 void gls_begin(float x, float y, float z, float rx, float ry, float rz);
-void gls_draw(bool clear);
-
-void gls_setViewport(uint32_t width, uint32_t height);
-void gls_setFOV(float fov);
-void gls_setNearFar(float near, float far);
-
 void gls_pushState();
 void gls_popState();
 gls_State* gls_getState();
 gls_State* gls_getStateIndex(uint64_t index);
+void gls_draw(bool clear);
 
 void gls_origin(float x, float y, float z);
 void gls_translate(float x, float y, float z);
 void gls_rotate(float x, float y, float z);
 void gls_scale(float x, float y, float z);
-
 void gls_colorRGB(float r, float g, float b);
 void gls_colorHSV(float h, float s, float v);
 gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb);
-
 void gls_vertex(float x, float y, float z);
+
 gls_Vec3f gls_applyTrans(float x, float y, float z);
+void gls_setMatrix();
 gls_Vec3f gls_normalize(gls_Vec3f vec);
 gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y);
 float gls_dot(gls_Vec3f x, gls_Vec3f y);
 
+void gls_setViewport(uint32_t width, uint32_t height);
+void gls_setFOV(float fov);
+void gls_setNearFar(float near, float far);
 void gls_setWireframe(bool state);
 void gls_setFrontFace(bool ccw);
