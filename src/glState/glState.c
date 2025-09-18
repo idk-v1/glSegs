@@ -438,11 +438,6 @@ void gls_draw(bool clear)
 	view[3 + 2 * 4] = gls_dot(lookat, lookat);
 	view[3 + 3 * 4] = 1.f;
 
-	//view[0 + 0 * 4] = 1.f;
-	//view[1 + 1 * 4] = 1.f;
-	//view[2 + 2 * 4] = 1.f;
-	//view[3 + 3 * 4] = 1.f;
-
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
 
 	if (clear)
