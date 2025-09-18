@@ -408,7 +408,7 @@ void gls_draw(bool clear)
 
 	float angle = gls_toRad(45.f);
 	float aspect = (float)_gls_width / (float)_gls_height;
-	float far = 1000.f;
+	float far = 10000.f;
 	float near = 0.1f;
 	float proj[4 * 4] = { 0 };
 	proj[0 + 0 * 4] = 1.f / (aspect * tanf(angle / 2.f));
