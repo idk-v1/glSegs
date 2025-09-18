@@ -420,7 +420,7 @@ int main(int argc, char** argv)
 					}
 					gls_rotate(0.f, 90.f, 0.f);
 					gls_pushState();
-					gls_rotate(100.f + sinf(gls_toRad((float)timer * 20.f)) * 10.f, 0.f, 0.f);
+					gls_rotate(100.f, 0.f, 0.f);
 					gls_origin(0.f, -50.f, 0.f);
 					gls_translate(0.f, 120.f, 0.f);
 					for (size_t i = 0; i < penis.length; i++)

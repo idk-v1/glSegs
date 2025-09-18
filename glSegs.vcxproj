@@ -162,10 +162,6 @@
     <None Include="src\glState\shader.frag" />
     <None Include="src\glState\shader.vert" />
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="para\lowpoly_parasaur.obj" />
-    <Object Include="para\penis.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
