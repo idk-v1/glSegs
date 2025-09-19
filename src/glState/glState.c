@@ -49,6 +49,14 @@ gls_Vec3f gls_vec3f_div(gls_Vec3f left, gls_Vec3f right)
 	return vec;
 }
 
+gls_Vec3f gls_vec3f_abs(gls_Vec3f vec)
+{
+	vec.x = abs(vec.x);
+	vec.y = abs(vec.y);
+	vec.z = abs(vec.z);
+	return vec;
+}
+
 gls_Vec3f gls_vec3f(float x, float y, float z)
 {
 	gls_Vec3f vec;

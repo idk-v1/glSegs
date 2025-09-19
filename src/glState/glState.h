@@ -45,6 +45,7 @@ gls_Vec3f gls_vec3f_add(gls_Vec3f left, gls_Vec3f right);
 gls_Vec3f gls_vec3f_sub(gls_Vec3f left, gls_Vec3f right);
 gls_Vec3f gls_vec3f_mul(gls_Vec3f left, gls_Vec3f right);
 gls_Vec3f gls_vec3f_div(gls_Vec3f left, gls_Vec3f right);
+gls_Vec3f gls_vec3f_abs(gls_Vec3f vec);
 gls_Vec3f gls_vec3f(float x, float y, float z);
 gls_Vec3f gls_vec3f1(float x);
 

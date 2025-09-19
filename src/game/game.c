@@ -164,6 +164,7 @@ void game_drawModel(Game* game, gls_Stack* verts)
 	for (size_t i = 0; i < verts->length; i += 3)
 	{
 		gls_Vec3f* tri = stack_index(verts, i / 3 * 3);
+
 		gls_Vec3f u = gls_vec3f_sub(tri[1], tri[0]);
 		gls_Vec3f v = gls_vec3f_sub(tri[2], tri[0]);
 
@@ -174,7 +175,12 @@ void game_drawModel(Game* game, gls_Stack* verts)
 		norm = gls_normalize(norm);
 
 		gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
-		gls_colorHSV(color.x, color.y, color.z - 0.1f);
+		gls_Vec3f lightNorm = gls_normalize(gls_vec3f(0.f, 1.f, 0.f));
+
+		gls_Vec3f vecDist = gls_vec3f_sub(norm, lightNorm);
+		float dist = sqrtf(vecDist.x * vecDist.x + vecDist.y * vecDist.y + vecDist.z * vecDist.z);
+
+		gls_colorHSV(color.x, color.y, color.z - dist * 0.5f);
 
 		gls_vertex(tri[0].x, tri[0].y, tri[0].z);
 		gls_vertex(tri[1].x, tri[1].y, tri[1].z);
