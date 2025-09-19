@@ -142,6 +142,7 @@
     <ClCompile Include="glad\src\glad.c" />
     <ClCompile Include="glfw\include\GLFW\util\win32_darkTheme.c" />
     <ClCompile Include="glfw\include\GLFW\util\win32_sleep.c" />
+    <ClCompile Include="src\game\game.c" />
     <ClCompile Include="src\glState\glState.c" />
     <ClCompile Include="src\glState\stack.c" />
     <ClCompile Include="src\main.c" />
@@ -154,6 +155,7 @@
     <ClInclude Include="glfw\include\GLFW\glfw3native.h" />
     <ClInclude Include="glfw\include\GLFW\util\darkTheme.h" />
     <ClInclude Include="glfw\include\GLFW\util\sleep.h" />
+    <ClInclude Include="src\game\game.h" />
     <ClInclude Include="src\glState\glState.h" />
     <ClInclude Include="src\glState\stack.h" />
     <ClInclude Include="src\objReader\objReader.h" />

@@ -6,12 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <GLFW/util/darkTheme.h>
-#include <GLFW/util/sleep.h>
-
-#include "glState/glState.h"
-
-#include "objReader/objReader.h"
+#include "game/game.h"
 
 void drawRect(float xs, float ys, float zs)
 {
@@ -263,193 +258,19 @@ void drawDino(float timer)
 
 int main(int argc, char** argv)
 {
-	glfwInit();
+	Game game = game_init(800, 600, "");
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	int width = 800, height = 600;
-	GLFWwindow* window = glfwCreateWindow(width, height, "", NULL, NULL);
-	glfwSetWindowTheme(window, GLFW_THEME_AUTO);
-
-	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-	gls_setViewport(width, height);
-
-	gls_init();
-	gls_setNearFar(0.1f, 10000.f);
-	gls_setFOV(90.f);
-
-	gls_Stack lpParaVerts = obj_readVerts("para/lowpoly_parasaur.obj");
-	gls_Stack penis = obj_readVerts("para/penis.obj");
-
-	gls_Vec3f pos = { 0 };
-	gls_Vec3f vel = { 0 };
-	gls_Vec3f rot = { 0 };
-	float lookSpeed = 0.25f;
-	float moveSpeed = 0.75f;
-
-	double lastTime = glfwGetTime();
-	double deltaTime = 0;
-	double timer = 0;
-
-	bool tabLast = false;
-	bool wireframe = false;
-
-	float fov = 90.f;
-
-	bool pauseState = false;
-	bool escStateLast = false;
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPos(window, width / 2.f, height / 2.f);
-
-	while (!glfwWindowShouldClose(window))
+	while (game.isOpen)
 	{
-		double time = glfwGetTime();
-		deltaTime += time - lastTime;
-		lastTime = time;
-
-		int lastWidth = width;
-		int lastHeight = height;
-		glfwGetFramebufferSize(window, &width, &height);
-		if (lastWidth != width || lastHeight != height)
-			gls_setViewport(width, height);
-
-		// pause state
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) && !escStateLast)
-		{
-			pauseState = !pauseState;
-			if (pauseState)
-			{
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				glfwSetCursorPos(window, width / 2.f, height / 2.f);
-			}
-			else
-			{
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-				glfwSetCursorPos(window, width / 2.f, height / 2.f);
-				deltaTime = 0;
-				lastTime = glfwGetTime();
-			}
-		}
-		escStateLast = glfwGetKey(window, GLFW_KEY_ESCAPE);
-
-		// movement
-		gls_Vec3f accel = { 0 };
-		int zDir = glfwGetKey(window, GLFW_KEY_S) - glfwGetKey(window, GLFW_KEY_W);
-		int xDir = glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A);
-		accel.z += (cosf(gls_toRad(rot.y)) * zDir - sinf(gls_toRad(rot.y)) * xDir) * moveSpeed;
-		accel.x += (sinf(gls_toRad(rot.y)) * zDir + cosf(gls_toRad(rot.y)) * xDir) * moveSpeed;
-		accel.y += (glfwGetKey(window, GLFW_KEY_SPACE) - 
-			glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) * moveSpeed;
-
-		bool tab = glfwGetKey(window, GLFW_KEY_TAB);
-		if (tab && !tabLast)
-		{
-			wireframe = !wireframe;
-			gls_setWireframe(wireframe);
-		}
-		tabLast = tab;
-
-		if (!pauseState)
-		{
-			// update loop
-			while (deltaTime >= 1.f / 60.f)
-			{
-				timer++;
-
-				deltaTime -= 1.f / 60.f;
-
-				gls_vec3f_add(&vel, accel);
-				gls_vec3f_mul(&vel, gls_vec3f(0.8f, 0.8f, 0.8f));
-				gls_vec3f_add(&pos, vel);
-
-				if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT))
-				{
-					if (fov > 10.f)
-						fov -= 1.f;
-					if (fov < 10.f)
-						fov = 10.f;
-				}
-				else
-				{
-					if (fov < 90.f)
-						fov += 1.f;
-					if (fov > 90.f)
-						fov = 90.f;
-				}
-				gls_setFOV(fov);
-			}
-
-			double mouseX, mouseY;
-			glfwGetCursorPos(window, &mouseX, &mouseY);
-			rot.y -= (float)(mouseX - width / 2.f) * lookSpeed;
-			rot.x += (float)(height / 2.f - mouseY) * lookSpeed;
-			glfwSetCursorPos(window, width / 2.f, height / 2.f);
-
-			if (rot.x > 90.f)
-				rot.x = 90.f;
-			if (rot.x < -90.f)
-				rot.x = -90.f;
-			rot.y = gls_wrapDeg(rot.y);
-			rot.z = gls_wrapDeg(rot.z);
-
-
-			char titleBuf[100];
-			snprintf(titleBuf, 100,
-				"Pos(x, y, z): %1.f, %1.f, %1.f | Rot(x, y, z): %1.f, %1.f, %1.f",
-				pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
-			glfwSetWindowTitle(window, titleBuf);
-
-
-			gls_begin(pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
-
-			gls_scale(0.1f, 0.1f, 0.1f);
-			//gls_rotate(0.f, (float)timer, 0.f);
-			
-			for (int x = -0; x <= 0; x++)
-				for (int z = -0; z <= 0; z++)
-				{
-					gls_pushState();
-					gls_origin(300.f * x, 0.f, 300.f * z);
-					for (size_t i = 0; i < lpParaVerts.length; i++)
-					{
-						gls_colorHSV((float)timer / 360.f + i * 0.1f, 1.f, 1.f);
-						gls_vertex(((gls_Vec3f*)stack_index(&lpParaVerts, i))->x,
-							((gls_Vec3f*)stack_index(&lpParaVerts, i))->y,
-							((gls_Vec3f*)stack_index(&lpParaVerts, i))->z);
-					}
-					gls_rotate(0.f, 90.f, 0.f);
-					gls_pushState();
-					gls_rotate(100.f, 0.f, 0.f);
-					gls_origin(0.f, -50.f, 0.f);
-					gls_translate(0.f, 120.f, 0.f);
-					for (size_t i = 0; i < penis.length; i++)
-					{
-						gls_colorHSV((float)timer / 360.f + i * 0.1f, 1.f, 1.f);
-						gls_vertex(((gls_Vec3f*)stack_index(&penis, i))->x,
-							((gls_Vec3f*)stack_index(&penis, i))->y,
-							((gls_Vec3f*)stack_index(&penis, i))->z);
-					}
-					gls_popState();
-					gls_popState();
-				}
-
-			gls_draw(true);
-			glfwSwapBuffers(window);
-		}
-
-		glfwPollEvents();
-
-		//glfwSleep(1.f / 1000.f);
+		game_update(&game);
+		game_setTitle(&game, 
+			"Pos(x, y, z): %1.f, %1.f, %1.f | Rot(x, y, z): %1.f, %1.f, %1.f",
+			game.player.pos.x, game.player.pos.y, game.player.pos.z, 
+			game.player.rot.x, game.player.rot.y, game.player.rot.z);
+		game_draw(&game);
 	}
-	glfwDestroyWindow(window);
 
-	stack_free(&penis);
-	stack_free(&lpParaVerts);
+	game_delete(&game);
 
-	glfwTerminate();
 	return 0;
 }
