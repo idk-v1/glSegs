@@ -345,7 +345,7 @@ gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb)
 
 void gls_vertex(float x, float y, float z)
 {
-	gls_Vec3f point = gls_applyTrans(x, y, z);
+	gls_Vec3f point = gls_vec3f(x, y, z);
 
 	stack_push(&_gls_verts, &point);
 

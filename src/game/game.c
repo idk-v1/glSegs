@@ -149,8 +149,8 @@ void game_draw(Game* game)
 			gls_pushState();
 			gls_origin(75.f * x, 0.f, 75.f * z);
 			gls_scale(0.2f, 0.2f, 0.2f);
-			//gls_rotate(0.f, (float)game->ticks, 0.f);
-			//gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
+			gls_rotate(0.f, (float)game->ticks, 0.f);
+			gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
 			game_drawModel(game, &game->paraVerts);
 			gls_popState();
 		}
@@ -163,8 +163,13 @@ void game_drawModel(Game* game, gls_Stack* verts)
 {
 	for (size_t i = 0; i < verts->length; i += 3)
 	{
-		gls_Vec3f* tri = stack_index(verts, i / 3 * 3);
+		gls_Vec3f* vertPtr = stack_index(verts, i);
+		gls_Vec3f tri[3];
+		tri[0] = gls_applyTrans(vertPtr[0].x, vertPtr[0].y, vertPtr[0].z);
+		tri[1] = gls_applyTrans(vertPtr[1].x, vertPtr[1].y, vertPtr[1].z);
+		tri[2] = gls_applyTrans(vertPtr[2].x, vertPtr[2].y, vertPtr[2].z);
 
+		// lighting
 		gls_Vec3f u = gls_vec3f_sub(tri[1], tri[0]);
 		gls_Vec3f v = gls_vec3f_sub(tri[2], tri[0]);
 
@@ -175,12 +180,19 @@ void game_drawModel(Game* game, gls_Stack* verts)
 		norm = gls_normalize(norm);
 
 		gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
-		gls_Vec3f lightNorm = gls_normalize(gls_vec3f(0.f, 1.f, 0.f));
+		gls_Vec3f lightNorm = gls_normalize(gls_vec3f(1.f, 0.f, 0.f));
 
 		gls_Vec3f vecDist = gls_vec3f_sub(norm, lightNorm);
-		float dist = sqrtf(vecDist.x * vecDist.x + vecDist.y * vecDist.y + vecDist.z * vecDist.z);
+		float dist = sqrtf(vecDist.x * vecDist.x + vecDist.y * vecDist.y + vecDist.z * vecDist.z) / 2.f;
+		if (dist < 0.40f) // 0.36 is 45deg from light
+			dist *= 0.25f;
+		else if (dist < 0.71f) // 0.71 is 90deg from light
+			dist *= 0.40f;
+		else // 1.00 is 180deg from light
+			dist *= 0.95f;
 
-		gls_colorHSV(color.x, color.y, color.z - dist * 0.5f);
+
+		gls_colorHSV(color.x, color.y, color.z * (1 - dist));
 
 		gls_vertex(tri[0].x, tri[0].y, tri[0].z);
 		gls_vertex(tri[1].x, tri[1].y, tri[1].z);
