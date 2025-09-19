@@ -41,11 +41,12 @@ extern float _gls_fov;
 extern float _gls_near;
 extern float _gls_far;
 
-void gls_vec3f_add(gls_Vec3f* left, gls_Vec3f right);
-void gls_vec3f_sub(gls_Vec3f* left, gls_Vec3f right);
-void gls_vec3f_mul(gls_Vec3f* left, gls_Vec3f right);
-void gls_vec3f_div(gls_Vec3f* left, gls_Vec3f right);
+gls_Vec3f gls_vec3f_add(gls_Vec3f left, gls_Vec3f right);
+gls_Vec3f gls_vec3f_sub(gls_Vec3f left, gls_Vec3f right);
+gls_Vec3f gls_vec3f_mul(gls_Vec3f left, gls_Vec3f right);
+gls_Vec3f gls_vec3f_div(gls_Vec3f left, gls_Vec3f right);
 gls_Vec3f gls_vec3f(float x, float y, float z);
+gls_Vec3f gls_vec3f1(float x);
 
 float gls_toRad(float deg);
 float gls_toDeg(float rad);

@@ -76,9 +76,9 @@ void game_update(Game* game)
 			game->ticks++;
 			game->deltaTime -= 1.f / 60.f;
 
-			gls_vec3f_add(&game->player.vel, game->player.acc);
-			gls_vec3f_mul(&game->player.vel, gls_vec3f(0.8f, 0.8f, 0.8f));
-			gls_vec3f_add(&game->player.pos, game->player.vel);
+			game->player.vel = gls_vec3f_add(game->player.vel, game->player.acc);
+			game->player.vel = gls_vec3f_mul(game->player.vel, gls_vec3f1(0.8f));
+			game->player.pos = gls_vec3f_add(game->player.pos, game->player.vel);
 		}
 	}
 
@@ -147,10 +147,10 @@ void game_draw(Game* game)
 		for (int z = -3; z <= 3; z++)
 		{
 			gls_pushState();
-			gls_origin(50.f * x, 0.f, 50.f * z);
-			gls_scale(0.1f, 0.1f, 0.1f);
-			gls_rotate(0.f, (float)game->ticks, 0.f);
-			gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
+			gls_origin(75.f * x, 0.f, 75.f * z);
+			gls_scale(0.2f, 0.2f, 0.2f);
+			//gls_rotate(0.f, (float)game->ticks, 0.f);
+			//gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
 			game_drawModel(game, &game->paraVerts);
 			gls_popState();
 		}
@@ -161,11 +161,26 @@ void game_draw(Game* game)
 
 void game_drawModel(Game* game, gls_Stack* verts)
 {
-	for (size_t i = 0; i < game->paraVerts.length; i++)
+	for (size_t i = 0; i < verts->length; i += 3)
 	{
-		gls_vertex(((gls_Vec3f*)stack_index(verts, i))->x,
-			((gls_Vec3f*)stack_index(verts, i))->y,
-			((gls_Vec3f*)stack_index(verts, i))->z);
+		gls_Vec3f* tri = stack_index(verts, i / 3 * 3);
+		gls_Vec3f u = gls_vec3f_sub(tri[1], tri[0]);
+		gls_Vec3f v = gls_vec3f_sub(tri[2], tri[0]);
+
+		gls_Vec3f norm = { 0 };
+		norm.x = u.y * v.z - u.z * v.y;
+		norm.y = u.z * v.x - u.x * v.z;
+		norm.z = u.x * v.y - u.y * v.x;
+		norm = gls_normalize(norm);
+
+		gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
+		gls_colorHSV(color.x, color.y, color.z - 0.1f);
+
+		gls_vertex(tri[0].x, tri[0].y, tri[0].z);
+		gls_vertex(tri[1].x, tri[1].y, tri[1].z);
+		gls_vertex(tri[2].x, tri[2].y, tri[2].z);
+
+		gls_colorHSV(color.x, color.y, color.z);
 	}
 }
 

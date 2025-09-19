@@ -13,32 +13,40 @@ float _gls_near = 0.1f;
 float _gls_far = 1000.f;
 
 
-void gls_vec3f_add(gls_Vec3f* left, gls_Vec3f right)
+gls_Vec3f gls_vec3f_add(gls_Vec3f left, gls_Vec3f right)
 {
-	left->x += right.x;
-	left->y += right.y;
-	left->z += right.z;
+	gls_Vec3f vec;
+	vec.x = left.x + right.x;
+	vec.y = left.y + right.y;
+	vec.z = left.z + right.z;
+	return vec;
 }
 
-void gls_vec3f_sub(gls_Vec3f* left, gls_Vec3f right)
+gls_Vec3f gls_vec3f_sub(gls_Vec3f left, gls_Vec3f right)
 {
-	left->x -= right.x;
-	left->y -= right.y;
-	left->z -= right.z;
+	gls_Vec3f vec;
+	vec.x = left.x - right.x;
+	vec.y = left.y - right.y;
+	vec.z = left.z - right.z;
+	return vec;
 }
 
-void gls_vec3f_mul(gls_Vec3f* left, gls_Vec3f right)
+gls_Vec3f gls_vec3f_mul(gls_Vec3f left, gls_Vec3f right)
 {
-	left->x *= right.x;
-	left->y *= right.y;
-	left->z *= right.z;
+	gls_Vec3f vec;
+	vec.x = left.x * right.x;
+	vec.y = left.y * right.y;
+	vec.z = left.z * right.z;
+	return vec;
 }
 
-void gls_vec3f_div(gls_Vec3f* left, gls_Vec3f right)
+gls_Vec3f gls_vec3f_div(gls_Vec3f left, gls_Vec3f right)
 {
-	left->x /= right.x;
-	left->y /= right.y;
-	left->z /= right.z;
+	gls_Vec3f vec;
+	vec.x = left.x / right.x;
+	vec.y = left.y / right.y;
+	vec.z = left.z / right.z;
+	return vec;
 }
 
 gls_Vec3f gls_vec3f(float x, float y, float z)
@@ -48,6 +56,11 @@ gls_Vec3f gls_vec3f(float x, float y, float z)
 	vec.y = y;
 	vec.z = z;
 	return vec;
+}
+
+gls_Vec3f gls_vec3f1(float x)
+{
+	return gls_vec3f(x, x, x);
 }
 
 
@@ -347,8 +360,8 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 
 	for (uint64_t i = _gls_state.length - 1; i > 0; i--)
 	{
-		gls_vec3f_add(&point, gls_getStateIndex(i)->translate);
-		gls_vec3f_mul(&point, gls_getStateIndex(i)->scale);
+		point = gls_vec3f_add(point, gls_getStateIndex(i)->translate);
+		point = gls_vec3f_mul(point, gls_getStateIndex(i)->scale);
 
 		float angleY = gls_toDeg(atan2f(point.x, point.z)) + gls_getStateIndex(i)->rotate.y;
 		float distXZ = sqrtf(powf(point.x, 2) + powf(point.z, 2));
@@ -360,12 +373,10 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 		point.y = distYZ * sinf(gls_toRad(angleX));
 		point.z = distYZ * cosf(gls_toRad(angleX));
 
-		gls_vec3f_add(&point, gls_getStateIndex(i)->origin);
+		point = gls_vec3f_add(point, gls_getStateIndex(i)->origin);
 	}
 
-	gls_vec3f_sub(&point, _gls_camera.pos);
-
-	return point;
+	return gls_vec3f_sub(point, _gls_camera.pos);
 }
 
 void gls_setMatrix()
@@ -425,8 +436,8 @@ gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y)
 
 float gls_dot(gls_Vec3f x, gls_Vec3f y)
 {
-	gls_vec3f_mul(&x, y);
-	return x.x + x.y + x.z;
+	gls_Vec3f vec = gls_vec3f_mul(x, y);
+	return vec.x + vec.y + vec.z;
 }
 
 
