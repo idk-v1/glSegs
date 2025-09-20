@@ -186,10 +186,10 @@ void game_drawModel(Game* game, gls_Stack* verts)
 		float dist = sqrtf(vecDist.x * vecDist.x + vecDist.y * vecDist.y + vecDist.z * vecDist.z) / 2.f;
 		if (dist < 0.40f) // 0.36 is 45deg from light
 			dist *= 0.25f;
-		else if (dist < 0.71f) // 0.71 is 90deg from light
+		else if (dist < 0.73f) // 0.71 is 90deg from light
 			dist *= 0.40f;
 		else // 1.00 is 180deg from light
-			dist *= 0.95f;
+			dist *= 0.85f;
 
 
 		gls_colorHSV(color.x, color.y, color.z * (1 - dist));
