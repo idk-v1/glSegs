@@ -268,54 +268,30 @@ void gls_colorRGB(float r, float g, float b)
 
 void gls_colorHSV(float h, float s, float v)
 {
-	float r = 0, g = 0, b = 0;
-
-	if (h < 0)
-		h = 360.f - fmodf(-h, 360.f);
-	else
-		h = fmodf(h, 360.f);
-
-	int i = (int)(h * 6);
-	float f = h * 6 - i;
-	float p = v * (1 - s);
-	float q = v * (1 - f * s);
-	float t = v * (1 - (1 - f) * s);
-
-	switch (abs(i) % 6)
-	{
-	case 0: r = v, g = t, b = p; break;
-	case 1: r = q, g = v, b = p; break;
-	case 2: r = p, g = v, b = t; break;
-	case 3: r = p, g = q, b = v; break;
-	case 4: r = t, g = p, b = v; break;
-	case 5: r = v, g = p, b = q; break;
-	}
-
-	gls_Vec3f vec = { r, g, b };
-	gls_getState()->color = vec;
+	gls_getState()->color = gls_colorHSVtoRGB(h, s, v);
 }
 
-gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb)
+gls_Vec3f gls_colorRGBtoHSV(float r, float g, float b)
 {
 	gls_Vec3f hsv = { 0.f };
 
-	float fCMax = max(max(rgb.x, rgb.y), rgb.z);
-	float fCMin = min(min(rgb.x, rgb.y), rgb.z);
+	float fCMax = max(max(r, g), b);
+	float fCMin = min(min(r, g), b);
 	float fDelta = fCMax - fCMin;
 
 	if (fDelta > 0.f)
 	{
-		if (fCMax == rgb.x)
+		if (fCMax == r)
 		{
-			hsv.x = 60.f * (fmodf(((rgb.y - rgb.z) / fDelta), 6.f));
+			hsv.x = 60.f * (fmodf(((g - b) / fDelta), 6.f));
 		}
-		else if (fCMax == rgb.y)
+		else if (fCMax == g)
 		{
-			hsv.x = 60.f * (((rgb.z - rgb.x) / fDelta) + 2.f);
+			hsv.x = 60.f * (((b - r) / fDelta) + 2.f);
 		}
-		else if (fCMax == rgb.z)
+		else if (fCMax == b)
 		{
-			hsv.x = 60.f * (((rgb.x - rgb.y) / fDelta) + 4.f);
+			hsv.x = 60.f * (((r - g) / fDelta) + 4.f);
 		}
 
 		if (fCMax > 0.f)
@@ -343,13 +319,77 @@ gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb)
 	return hsv;
 }
 
+gls_Vec3f gls_colorHSVtoRGB(float h, float s, float v)
+{
+	float r = 0, g = 0, b = 0;
+
+	if (h < 0)
+		h = 360.f - fmodf(-h, 360.f);
+	else
+		h = fmodf(h, 360.f);
+
+	int i = (int)(h * 6);
+	float f = h * 6 - i;
+	float p = v * (1 - s);
+	float q = v * (1 - f * s);
+	float t = v * (1 - (1 - f) * s);
+
+	switch (abs(i) % 6)
+	{
+	case 0: r = v, g = t, b = p; break;
+	case 1: r = q, g = v, b = p; break;
+	case 2: r = p, g = v, b = t; break;
+	case 3: r = p, g = q, b = v; break;
+	case 4: r = t, g = p, b = v; break;
+	case 5: r = v, g = p, b = q; break;
+	}
+
+	return gls_vec3f(r, g, b);
+}
+
 void gls_vertex(float x, float y, float z)
 {
-	gls_Vec3f point = gls_vec3f(x, y, z);
+	gls_Vec3f point = gls_applyTrans(x, y, z);
 
 	stack_push(&_gls_verts, &point);
 
 	stack_push(&_gls_verts, &gls_getState()->color);
+
+	if (_gls_verts.length % 6 == 0) // full triangle
+	{
+		gls_Vec3f* tri = stack_index(&_gls_verts, _gls_verts.length - 6);
+
+		// lighting
+		gls_Vec3f u = gls_vec3f_sub(tri[2], tri[0]);
+		gls_Vec3f v = gls_vec3f_sub(tri[4], tri[0]);
+
+		gls_Vec3f norm = { 0 };
+		norm.x = u.y * v.z - u.z * v.y;
+		norm.y = u.z * v.x - u.x * v.z;
+		norm.z = u.x * v.y - u.y * v.x;
+		norm = gls_normalize(norm);
+
+		gls_Vec3f lightNorm = gls_normalize(gls_vec3f(1.f, 0.f, 0.f));
+
+		gls_Vec3f vecDist = gls_vec3f_sub(norm, lightNorm);
+		float dist = sqrtf(vecDist.x * vecDist.x + vecDist.y * vecDist.y + 
+			vecDist.z * vecDist.z) / 2.f;
+
+		// smooth lighting adjustments
+		if (dist < 0.40f) // 0.36 is 45deg from light
+			dist *= 0.25f;
+		else if (dist < 0.73f) // 0.71 is 90deg from light
+			dist *= 0.40f;
+		else // 1.00 is 180deg from light
+			dist *= 0.85f;
+
+		gls_Vec3f color = gls_colorRGBtoHSV(tri[1].x, tri[1].y, tri[1].z);
+		tri[1] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
+		color = gls_colorRGBtoHSV(tri[3].x, tri[3].y, tri[3].z);
+		tri[3] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
+		color = gls_colorRGBtoHSV(tri[5].x, tri[5].y, tri[5].z);
+		tri[5] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
+	}
 }
 
 

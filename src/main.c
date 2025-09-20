@@ -10,7 +10,8 @@
 
 void drawRect(float xs, float ys, float zs)
 {
-	gls_Vec3f color = gls_colorRGBtoHSV(gls_getState()->color);
+	gls_Vec3f color = gls_colorRGBtoHSV(
+		gls_getState()->color.x, gls_getState()->color.y, gls_getState()->color.z);
 	
 	// left
 	gls_colorHSV(color.x, color.y, color.z - 0.0125f);

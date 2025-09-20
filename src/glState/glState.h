@@ -69,7 +69,8 @@ void gls_rotate(float x, float y, float z);
 void gls_scale(float x, float y, float z);
 void gls_colorRGB(float r, float g, float b);
 void gls_colorHSV(float h, float s, float v);
-gls_Vec3f gls_colorRGBtoHSV(gls_Vec3f rgb);
+gls_Vec3f gls_colorRGBtoHSV(float r, float g, float b);
+gls_Vec3f gls_colorHSVtoRGB(float h, float s, float v);
 void gls_vertex(float x, float y, float z);
 
 gls_Vec3f gls_applyTrans(float x, float y, float z);
