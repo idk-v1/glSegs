@@ -54,7 +54,7 @@ void game_delete(Game* game)
 	glfwDestroyWindow(game->window);
 	stack_free(&game->paraVerts);
 
-	memset(&game, 0, sizeof(Game));
+	memset(game, 0, sizeof(Game));
 
 	glfwTerminate();
 }
