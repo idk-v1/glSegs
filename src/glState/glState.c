@@ -405,7 +405,11 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 		}
 		case 1: // global
 		{
-			gls_Vec3f lightNorm = gls_normalize(gls_vec3f(0.f, 1.f, 0.f));
+			gls_Vec3f lightNorm = gls_normalize(gls_vec3f(
+				-sinf(gls_toRad(light->rot.y)) * cosf(gls_toRad(light->rot.x)),
+				sinf(gls_toRad(light->rot.x)),
+				-cosf(gls_toRad(light->rot.y)) * cosf(gls_toRad(light->rot.x))));
+
 			gls_Vec3f normDiffVec = gls_vec3f_sub(norm, lightNorm);
 			float normDiff = sqrtf(normDiffVec.x * normDiffVec.x +
 				normDiffVec.y * normDiffVec.y + normDiffVec.z * normDiffVec.z) / 2.f;

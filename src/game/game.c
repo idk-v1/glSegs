@@ -28,8 +28,8 @@ Game game_init(int width, int height, const char* title)
 	gls_setFOV(game.fov);
 	gls_setNearFar(0.1f, 10000.f);
 
-	//gls_addGlobalLight(90.f, 0.f, 0.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
-	gls_addPointLight(0.f, 50.f, 0.f, 500.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
+	gls_addGlobalLight(45.f, 0.f, 0.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
+	//gls_addPointLight(0.f, 50.f, 0.f, 500.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
 
 	game.player.moveSpeed = 0.75f;
 
