@@ -11,6 +11,7 @@ GLuint _gls_shader = 0;
 float _gls_fov = 75.f;
 float _gls_near = 0.1f;
 float _gls_far = 1000.f;
+bool _gls_autoLight = true;
 
 
 gls_Vec3f gls_vec3f_add(gls_Vec3f left, gls_Vec3f right)
@@ -51,9 +52,9 @@ gls_Vec3f gls_vec3f_div(gls_Vec3f left, gls_Vec3f right)
 
 gls_Vec3f gls_vec3f_abs(gls_Vec3f vec)
 {
-	vec.x = abs(vec.x);
-	vec.y = abs(vec.y);
-	vec.z = abs(vec.z);
+	vec.x = fabsf(vec.x);
+	vec.y = fabsf(vec.y);
+	vec.z = fabsf(vec.z);
 	return vec;
 }
 
@@ -355,9 +356,16 @@ void gls_vertex(float x, float y, float z)
 
 	stack_push(&_gls_verts, &gls_getState()->color);
 
-	if (_gls_verts.length % 6 == 0) // full triangle
+	if (_gls_autoLight && _gls_verts.length % 6 == 0) // full triangle
 	{
-		gls_Vec3f* tri = stack_index(&_gls_verts, _gls_verts.length - 6);
+		gls_Vec3f* triPtr = stack_index(&_gls_verts, _gls_verts.length - 6);
+		gls_Vec3f tri[6];
+		for (int i = 0; i < 6; i++)
+		{
+			tri[i] = triPtr[i];
+			if (i % 2 == 0)
+				tri[i] = gls_vec3f_add(tri[i], _gls_camera.pos);
+		}
 
 		// lighting
 		gls_Vec3f u = gls_vec3f_sub(tri[2], tri[0]);
@@ -369,26 +377,26 @@ void gls_vertex(float x, float y, float z)
 		norm.z = u.x * v.y - u.y * v.x;
 		norm = gls_normalize(norm);
 
-		gls_Vec3f lightNorm = gls_normalize(gls_vec3f(1.f, 0.f, 0.f));
+		// Global lighting
+		//gls_Vec3f lightNorm = gls_normalize(gls_vec3f(0.f, 1.f, 0.f));
+
+		// Point lighting
+		gls_Vec3f avg = gls_vec3f_add(gls_vec3f_add(tri[0], tri[2]), tri[4]);
+		avg = gls_vec3f_div(avg, gls_vec3f1(3.f));
+		gls_Vec3f lightPos = { 0.f, 0.f, 0.f };
+		gls_Vec3f lightNorm = gls_normalize(gls_vec3f_sub(lightPos, avg));
+
 
 		gls_Vec3f vecDist = gls_vec3f_sub(norm, lightNorm);
 		float dist = sqrtf(vecDist.x * vecDist.x + vecDist.y * vecDist.y + 
 			vecDist.z * vecDist.z) / 2.f;
 
-		// smooth lighting adjustments
-		if (dist < 0.40f) // 0.36 is 45deg from light
-			dist *= 0.25f;
-		else if (dist < 0.73f) // 0.71 is 90deg from light
-			dist *= 0.40f;
-		else // 1.00 is 180deg from light
-			dist *= 0.85f;
-
 		gls_Vec3f color = gls_colorRGBtoHSV(tri[1].x, tri[1].y, tri[1].z);
-		tri[1] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
+		triPtr[1] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
 		color = gls_colorRGBtoHSV(tri[3].x, tri[3].y, tri[3].z);
-		tri[3] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
+		triPtr[3] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
 		color = gls_colorRGBtoHSV(tri[5].x, tri[5].y, tri[5].z);
-		tri[5] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
+		triPtr[5] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - dist));
 	}
 }
 
@@ -506,6 +514,11 @@ void gls_setWireframe(bool state)
 void gls_setFrontFace(bool ccw)
 {
 	glFrontFace(ccw ? GL_CCW : GL_CW);
+}
+
+void gls_setAutolighting(bool state)
+{
+	_gls_autoLight = state;
 }
 
 void gls_setViewport(uint32_t width, uint32_t height)

@@ -40,6 +40,8 @@ Game game_init(int width, int height, const char* title)
 	glfwSetCursorPos(game.window, game.screenW / 2.f, game.screenH / 2.f);
 
 	game.paraVerts = obj_readVerts("para/lowpoly_parasaur.obj");
+	//game.paraVerts = obj_readVerts("para/stegosaurus.obj");
+	//game.paraVerts = obj_readVerts("para/trex.obj");
 
 	return game;
 }
@@ -143,14 +145,15 @@ void game_draw(Game* game)
 	gls_begin(game->player.pos.x, game->player.pos.y, game->player.pos.z, 
 		game->player.rot.x, game->player.rot.y, game->player.rot.z);
 
-	for (int x = -3; x <= 3; x++)
-		for (int z = -3; z <= 3; z++)
+	int dinoGrid = 7;
+	for (int x = -dinoGrid / 2; x <= dinoGrid / 2; x++)
+		for (int z = -dinoGrid / 2; z <= dinoGrid / 2; z++)
 		{
 			gls_pushState();
 			gls_origin(75.f * x, 0.f, 75.f * z);
-			gls_scale(0.2f, 0.2f, 0.2f);
-			gls_rotate(0.f, (float)game->ticks, 0.f);
-			gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
+			gls_scale(0.1f, 0.1f, 0.1f);
+			//gls_rotate(0.f, (float)game->ticks, 0.f);
+			//gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
 			game_drawModel(game, &game->paraVerts);
 			gls_popState();
 		}

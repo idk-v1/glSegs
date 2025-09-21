@@ -40,6 +40,7 @@ extern GLuint _gls_shader;
 extern float _gls_fov;
 extern float _gls_near;
 extern float _gls_far;
+extern bool _gls_autoLight;
 
 gls_Vec3f gls_vec3f_add(gls_Vec3f left, gls_Vec3f right);
 gls_Vec3f gls_vec3f_sub(gls_Vec3f left, gls_Vec3f right);
@@ -84,3 +85,4 @@ void gls_setFOV(float fov);
 void gls_setNearFar(float near, float far);
 void gls_setWireframe(bool state);
 void gls_setFrontFace(bool ccw);
+void gls_setAutolighting(bool state);
