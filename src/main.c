@@ -264,10 +264,6 @@ int main(int argc, char** argv)
 	while (game.isOpen)
 	{
 		game_update(&game);
-		game_setTitle(&game, 
-			"Pos(x, y, z): %1.f, %1.f, %1.f | Rot(x, y, z): %1.f, %1.f, %1.f",
-			game.player.pos.x, game.player.pos.y, game.player.pos.z, 
-			game.player.rot.x, game.player.rot.y, game.player.rot.z);
 		game_draw(&game);
 	}
 

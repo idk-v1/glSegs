@@ -42,6 +42,11 @@ typedef struct Game
 	double deltaTime;
 	uint64_t ticks;
 
+	double lastFrameTime;
+	double deltaFrameTime;
+	uint32_t fpsCount;
+	uint32_t fps;
+
 	Creature player;
 
 	gls_Stack paraVerts;
@@ -56,6 +61,6 @@ void game_playerInput(Game* game);
 
 void game_draw(Game* game);
 
-void game_drawModel(Game* game, gls_Stack* verts);
+void game_drawModel(gls_Stack* verts);
 
 void game_setTitle(Game* game, char* fmt, ...);

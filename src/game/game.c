@@ -28,8 +28,8 @@ Game game_init(int width, int height, const char* title)
 	gls_setFOV(game.fov);
 	gls_setNearFar(0.1f, 10000.f);
 
-	gls_addGlobalLight(45.f, 0.f, 0.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
-	//gls_addPointLight(0.f, 50.f, 0.f, 500.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
+	//gls_addGlobalLight(45.f, 0.f, 0.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
+	gls_addPointLight(0.f, 50.f, 0.f, 500.f, gls_colorHSVtoRGB(0.f, 0.f, 1.f));
 
 	game.player.moveSpeed = 0.75f;
 
@@ -38,6 +38,11 @@ Game game_init(int width, int height, const char* title)
 	game.ticks = 0;
 	game.pauseState = false;
 	game.escLast = false;
+
+	game.fps = 0;
+	game.fpsCount = 0;
+	game.lastFrameTime = glfwGetTime();
+	game.deltaFrameTime = 0;
 
 	glfwSetInputMode(game.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPos(game.window, game.screenW / 2.f, game.screenH / 2.f);
@@ -86,6 +91,13 @@ void game_update(Game* game)
 			game->player.pos = gls_vec3f_add(game->player.pos, game->player.vel);
 		}
 	}
+
+	//game_setTitle(game,
+	//	"Pos(x, y, z): %1.f, %1.f, %1.f | Rot(x, y, z): %1.f, %1.f, %1.f",
+	//	game->player.pos.x, game->player.pos.y, game->player.pos.z,
+	//	game->player.rot.x, game->player.rot.y, game->player.rot.z);
+
+	game_setTitle(game, "FPS: %u | Tri: %llu", game->fps, _gls_verts.length / 6);
 
 	glfwPollEvents();
 
@@ -145,27 +157,41 @@ void game_playerInput(Game* game)
 
 void game_draw(Game* game)
 {
+
 	gls_begin(game->player.pos.x, game->player.pos.y, game->player.pos.z, 
 		game->player.rot.x, game->player.rot.y, game->player.rot.z);
 
-	int dinoGrid = 7;
-	for (int x = -dinoGrid / 2; x <= dinoGrid / 2; x++)
-		for (int z = -dinoGrid / 2; z <= dinoGrid / 2; z++)
+	int dinoGrid = 3;
+	for (int x = -dinoGrid; x <= dinoGrid; x++)
+		for (int z = -dinoGrid; z <= dinoGrid; z++)
 		{
 			gls_pushState();
 			gls_origin(75.f * x, 0.f, 75.f * z);
 			gls_scale(0.1f, 0.1f, 0.1f);
-			//gls_rotate(0.f, (float)game->ticks, 0.f);
-			//gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
-			game_drawModel(game, &game->paraVerts);
+			gls_rotate(0.f, (float)game->ticks, 0.f);
+			gls_colorHSV(((float)game->ticks + (x + z) * 60.f) / 360.f, 0.5f, 1.f);
+			game_drawModel(&game->paraVerts);
 			gls_popState();
 		}
 
 	gls_draw(true);
 	glfwSwapBuffers(game->window);
+
+	double time = glfwGetTime();
+	game->deltaFrameTime += time - game->lastFrameTime;
+	game->lastFrameTime = time;
+
+	if (game->deltaFrameTime > 1.0)
+	{
+		game->deltaFrameTime = 0.f;
+		game->fps = game->fpsCount;
+		game->fpsCount = 0;
+	}
+
+	game->fpsCount++;
 }
 
-void game_drawModel(Game* game, gls_Stack* verts)
+void game_drawModel(gls_Stack* verts)
 {
 	for (size_t i = 0; i < verts->length; i++)
 	{
