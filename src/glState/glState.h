@@ -29,9 +29,19 @@ typedef struct gls_State
 	gls_Vec3f color;
 } gls_State;
 
+typedef struct gls_Light
+{
+	gls_Vec3f pos;
+	gls_Vec3f rot;
+	gls_Vec3f color;
+	float strength;
+	int type; // ambient (brightness), global (sun), point (normal), spotlight (spotlight)
+} gls_Light;
+
 extern gls_Camera _gls_camera;
 extern gls_Stack _gls_state;
 extern gls_Stack _gls_verts;
+extern gls_Stack _gls_lights;
 extern GLuint _gls_vao;
 extern GLuint _gls_vbo;
 extern uint32_t _gls_width;
@@ -40,7 +50,6 @@ extern GLuint _gls_shader;
 extern float _gls_fov;
 extern float _gls_near;
 extern float _gls_far;
-extern bool _gls_autoLight;
 
 gls_Vec3f gls_vec3f_add(gls_Vec3f left, gls_Vec3f right);
 gls_Vec3f gls_vec3f_sub(gls_Vec3f left, gls_Vec3f right);
@@ -74,6 +83,7 @@ gls_Vec3f gls_colorRGBtoHSV(float r, float g, float b);
 gls_Vec3f gls_colorHSVtoRGB(float h, float s, float v);
 void gls_vertex(float x, float y, float z);
 
+void gls_applyLighting(gls_Vec3f* triPtr);
 gls_Vec3f gls_applyTrans(float x, float y, float z);
 void gls_setMatrix();
 gls_Vec3f gls_normalize(gls_Vec3f vec);
@@ -85,4 +95,11 @@ void gls_setFOV(float fov);
 void gls_setNearFar(float near, float far);
 void gls_setWireframe(bool state);
 void gls_setFrontFace(bool ccw);
-void gls_setAutolighting(bool state);
+
+void gls_addLight(float x, float y, float z, float rx, float ry, float rz, 
+	float strength, gls_Vec3f color, int type);
+void gls_addAmbientLight(gls_Vec3f color);
+void gls_addGlobalLight(float rx, float ry, float rz, gls_Vec3f color);
+void gls_addPointLight(float x, float y, float z, float strength, gls_Vec3f color);
+void gls_addSpotLight(float x, float y, float z, float rx, float ry, float rz, 
+	float strength, gls_Vec3f color);
