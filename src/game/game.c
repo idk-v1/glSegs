@@ -161,7 +161,7 @@ void game_draw(Game* game)
 	gls_begin(game->player.pos.x, game->player.pos.y, game->player.pos.z, 
 		game->player.rot.x, game->player.rot.y, game->player.rot.z);
 
-	int dinoGrid = 3;
+	int dinoGrid = 5;
 	for (int x = -dinoGrid; x <= dinoGrid; x++)
 		for (int z = -dinoGrid; z <= dinoGrid; z++)
 		{

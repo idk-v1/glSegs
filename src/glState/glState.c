@@ -75,12 +75,14 @@ gls_Vec3f gls_vec3f1(float x)
 
 float gls_toRad(float deg)
 {
-	return deg / 180.f * 3.1415f;
+	const float toRad = 3.1415f / 180.f;
+	return deg * toRad;
 }
 
 float gls_toDeg(float rad)
 {
-	return rad / 3.1415f * 180.f;
+	const float toDeg = 180.f / 3.1415f;
+	return rad * toDeg;
 }
 
 float gls_wrapDeg(float deg)
@@ -411,7 +413,7 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 				-cosf(gls_toRad(light->rot.y)) * cosf(gls_toRad(light->rot.x))));
 
 			gls_Vec3f normDiffVec = gls_vec3f_sub(norm, lightNorm);
-			float normDiff = sqrtf(normDiffVec.x * normDiffVec.x +
+			float normDiff = gls_sqrt(normDiffVec.x * normDiffVec.x +
 				normDiffVec.y * normDiffVec.y + normDiffVec.z * normDiffVec.z) / 2.f;
 
 			gls_Vec3f color = gls_colorRGBtoHSV(tri[1].x, tri[1].y, tri[1].z);
@@ -430,11 +432,11 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 			gls_Vec3f lightNorm = gls_normalize(gls_vec3f_sub(lightPos, avg));
 
 			gls_Vec3f normDiffVec = gls_vec3f_sub(norm, lightNorm);
-			float normDiff = sqrtf(normDiffVec.x * normDiffVec.x +
+			float normDiff = gls_sqrt(normDiffVec.x * normDiffVec.x +
 				normDiffVec.y * normDiffVec.y + normDiffVec.z * normDiffVec.z) / 2.f;
 
 			gls_Vec3f distVec = gls_vec3f_sub(lightPos, avg);
-			float dist = sqrtf(distVec.x * distVec.x +
+			float dist = gls_sqrt(distVec.x * distVec.x +
 				distVec.y * distVec.y + distVec.z * distVec.z);
 
 			float strength;
@@ -479,13 +481,13 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 		point = gls_vec3f_add(point, gls_getStateIndex(i)->translate);
 		point = gls_vec3f_mul(point, gls_getStateIndex(i)->scale);
 
-		float angleY = gls_toDeg(atan2f(point.x, point.z)) + gls_getStateIndex(i)->rotate.y;
-		float distXZ = sqrtf(powf(point.x, 2) + powf(point.z, 2));
+		float angleY = gls_toDeg(gls_atan2(point.x, point.z)) + gls_getStateIndex(i)->rotate.y;
+		float distXZ = gls_sqrt(gls_pow2(point.x) + gls_pow2(point.z));
 		point.x = distXZ * sinf(gls_toRad(angleY));
 		point.z = distXZ * cosf(gls_toRad(angleY));
 
-		float angleX = gls_toDeg(atan2f(point.y, point.z)) + gls_getStateIndex(i)->rotate.x;
-		float distYZ = sqrtf(powf(point.y, 2) + powf(point.z, 2));
+		float angleX = gls_toDeg(gls_atan2(point.y, point.z)) + gls_getStateIndex(i)->rotate.x;
+		float distYZ = gls_sqrt(gls_pow2(point.y) + gls_pow2(point.z));
 		point.y = distYZ * sinf(gls_toRad(angleX));
 		point.z = distYZ * cosf(gls_toRad(angleX));
 
@@ -534,7 +536,7 @@ void gls_setMatrix()
 
 gls_Vec3f gls_normalize(gls_Vec3f vec)
 {
-	float dist = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	float dist = gls_sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 	vec.x /= dist;
 	vec.y /= dist;
 	vec.z /= dist;
@@ -554,6 +556,56 @@ float gls_dot(gls_Vec3f x, gls_Vec3f y)
 {
 	gls_Vec3f vec = gls_vec3f_mul(x, y);
 	return vec.x + vec.y + vec.z;
+}
+
+float gls_sqrt(float x)
+{	
+	union
+	{
+		int i;
+		float x;
+	} u;
+	u.x = x;
+	u.i = (1 << 29) + (u.i >> 1) - (1 << 22);
+
+	// Two Babylonian Steps (simplified from:)
+	// u.x = 0.5f * (u.x + x/u.x);
+	// u.x = 0.5f * (u.x + x/u.x);
+	u.x = u.x + x / u.x;
+	u.x = 0.25f * u.x + x / u.x;
+
+	return u.x;
+}
+
+float gls_atan2(float y, float x)
+{
+	//http://pubs.opengroup.org/onlinepubs/009695399/functions/atan2.html
+	//Volkan SALMA
+
+	const float ONEQTR_PI = 3.1415f / 4.f;
+	const float THRQTR_PI = 3.f * 3.1415f / 4.f;
+	float r, angle;
+	float abs_y = fabsf(y) + 1e-10f;      // kludge to prevent 0/0 condition
+	if (x < 0.0f)
+	{
+		r = (x + abs_y) / (abs_y - x);
+		angle = THRQTR_PI;
+	}
+	else
+	{
+		r = (x - abs_y) / (x + abs_y);
+		angle = ONEQTR_PI;
+	}
+	angle += (0.1963f * r * r - 0.9817f) * r;
+	if (y < 0.0f)
+		return(-angle);     // negate if in quad III or IV
+	else
+		return(angle);
+}
+
+float gls_pow2(float x)
+{
+	return x * x;
 }
 
 

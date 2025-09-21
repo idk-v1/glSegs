@@ -59,8 +59,8 @@ gls_Vec3f gls_vec3f_abs(gls_Vec3f vec);
 gls_Vec3f gls_vec3f(float x, float y, float z);
 gls_Vec3f gls_vec3f1(float x);
 
-float gls_toRad(float deg);
-float gls_toDeg(float rad);
+inline float gls_toRad(float deg);
+inline float gls_toDeg(float rad);
 float gls_wrapDeg(float deg);
 
 void gls_init();
@@ -89,6 +89,10 @@ void gls_setMatrix();
 gls_Vec3f gls_normalize(gls_Vec3f vec);
 gls_Vec3f gls_cross(gls_Vec3f x, gls_Vec3f y);
 float gls_dot(gls_Vec3f x, gls_Vec3f y);
+
+float gls_sqrt(float x);
+float gls_atan2(float y, float x);
+inline float gls_pow2(float x);
 
 void gls_setViewport(uint32_t width, uint32_t height);
 void gls_setFOV(float fov);
