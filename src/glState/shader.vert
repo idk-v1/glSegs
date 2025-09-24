@@ -4,8 +4,9 @@
 "out vec4 pixColor;\n"
 "uniform mat4 proj;\n"
 "uniform mat4 view;\n"
+"uniform vec3 camPos;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = proj * view * vec4(aPos, 1);\n"
+"   gl_Position = proj * view * vec4(aPos - camPos, 1);\n"
 "   pixColor = vec4(aColor, 1);\n"
 "}";

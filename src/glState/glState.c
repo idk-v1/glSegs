@@ -166,6 +166,7 @@ void gls_begin(float x, float y, float z, float rx, float ry, float rz)
 	
 	_gls_state.length = 1;
 	_gls_verts.length = 0;
+	_gls_lights.length = 0;
 	gls_pushState();
 
 	_gls_camera.pos = gls_vec3f(x, y, z);
@@ -198,6 +199,10 @@ gls_State* gls_getStateIndex(uint64_t index)
 
 void gls_draw(bool clear)
 {
+	//for (uint64_t i = 0; i < _gls_verts.length; i += 6)
+		//gls_applyLighting(stack_index(&_gls_verts, i));
+
+
 	glGenBuffers(1, &_gls_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, _gls_vbo);
 	glBufferData(GL_ARRAY_BUFFER,
@@ -359,29 +364,13 @@ void gls_vertex(float x, float y, float z)
 	stack_push(&_gls_verts, &point);
 
 	stack_push(&_gls_verts, &gls_getState()->color);
-
-	if (_gls_verts.length % 6 == 0) // full triangle
-	{
-		gls_applyLighting(stack_index(&_gls_verts, _gls_verts.length - 6));
-	}
 }
 
 
-void gls_applyLighting(gls_Vec3f* triPtr)
+void gls_applyLighting(gls_Vec3f* tri)
 {
 	// TODO:
-	// 1. no lighting colors
-	// 2. lighting not additives
-	// 3. no ambient mode
-	// 4. no spotlight mode
-
-	gls_Vec3f tri[6];
-	for (int i = 0; i < 6; i++)
-	{
-		tri[i] = triPtr[i];
-		if (i % 2 == 0)
-			tri[i] = gls_vec3f_add(tri[i], _gls_camera.pos);
-	}
+	// 1. no spotlight mode
 
 	gls_Vec3f u = gls_vec3f_sub(tri[2], tri[0]);
 	gls_Vec3f v = gls_vec3f_sub(tri[4], tri[0]);
@@ -395,6 +384,7 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 	gls_Vec3f avg = gls_vec3f_add(gls_vec3f_add(tri[0], tri[2]), tri[4]);
 	avg = gls_vec3f_div(avg, gls_vec3f1(3.f));
 
+	gls_Vec3f colorMul = { 0.f };
 
 	for (uint64_t i = 0; i < _gls_lights.length; i++)
 	{
@@ -403,6 +393,9 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 		{
 		case 0: // ambient
 		{
+			colorMul.x += light->color.x;
+			colorMul.y += light->color.y;
+			colorMul.z += light->color.z;
 			break;
 		}
 		case 1: // global
@@ -416,13 +409,11 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 			float normDiff = gls_sqrt(normDiffVec.x * normDiffVec.x +
 				normDiffVec.y * normDiffVec.y + normDiffVec.z * normDiffVec.z) / 2.f;
 
-			gls_Vec3f color = gls_colorRGBtoHSV(tri[1].x, tri[1].y, tri[1].z);
-			triPtr[1] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - normDiff));
-			color = gls_colorRGBtoHSV(tri[3].x, tri[3].y, tri[3].z);
-			triPtr[3] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - normDiff));
-			color = gls_colorRGBtoHSV(tri[5].x, tri[5].y, tri[5].z);
-			triPtr[5] = gls_colorHSVtoRGB(color.x, color.y, color.z * (1.f - normDiff));
+			float strength = 1.f - normDiff;
 
+			colorMul.x += light->color.x * strength;
+			colorMul.y += light->color.y * strength;
+			colorMul.z += light->color.z * strength;
 			break;
 		}
 		case 2: // point
@@ -439,6 +430,9 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 			float dist = gls_sqrt(distVec.x * distVec.x +
 				distVec.y * distVec.y + distVec.z * distVec.z);
 
+			if (dist > light->strength)
+				dist = light->strength;
+
 			float strength;
 			if (light->strength <= 0)
 				strength = 0;
@@ -447,12 +441,13 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 			else
 				strength = (light->strength - dist) / light->strength;
 
-			gls_Vec3f color = gls_colorRGBtoHSV(tri[1].x, tri[1].y, tri[1].z);
-			triPtr[1] = gls_colorHSVtoRGB(color.x, color.y, color.z * (strength - normDiff));
-			color = gls_colorRGBtoHSV(tri[3].x, tri[3].y, tri[3].z);
-			triPtr[3] = gls_colorHSVtoRGB(color.x, color.y, color.z * (strength - normDiff));
-			color = gls_colorRGBtoHSV(tri[5].x, tri[5].y, tri[5].z);
-			triPtr[5] = gls_colorHSVtoRGB(color.x, color.y, color.z * (strength - normDiff));
+			strength -= normDiff;
+			if (strength < 0.f)
+				strength = 0.f;
+
+			colorMul.x += light->color.x * strength;
+			colorMul.y += light->color.y * strength;
+			colorMul.z += light->color.z * strength;
 			break;
 		}
 		case 3: // spotlight
@@ -460,7 +455,24 @@ void gls_applyLighting(gls_Vec3f* triPtr)
 			break;
 		}
 		}
+
 	}
+
+	if (colorMul.x > 1.f)
+		colorMul.x = 1.f;
+	if (colorMul.x < 0.f)
+		colorMul.x = 0.f;
+	if (colorMul.y > 1.f)
+		colorMul.y = 1.f;
+	if (colorMul.y < 0.f)
+		colorMul.y = 0.f;
+	if (colorMul.z > 1.f)
+		colorMul.z = 1.f;
+	if (colorMul.z < 0.f)
+		colorMul.z = 0.f;
+	tri[1] = gls_vec3f_mul(colorMul, tri[1]);
+	tri[3] = gls_vec3f_mul(colorMul, tri[3]);
+	tri[5] = gls_vec3f_mul(colorMul, tri[5]);
 }
 
 gls_Vec3f gls_applyTrans(float x, float y, float z)
@@ -473,6 +485,7 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 
 	// BUGS:
 	//  - Rotating on both axises produces a pringle orbit
+	//  - Also offset changes when going over axis
 
 	gls_Vec3f point = { x, y, z };
 
@@ -494,7 +507,7 @@ gls_Vec3f gls_applyTrans(float x, float y, float z)
 		point = gls_vec3f_add(point, gls_getStateIndex(i)->origin);
 	}
 
-	return gls_vec3f_sub(point, _gls_camera.pos);
+	return point;
 }
 
 void gls_setMatrix()
@@ -532,6 +545,10 @@ void gls_setMatrix()
 	view[3 + 3 * 4] = 1.f;
 
 	glUniformMatrix4fv(glGetUniformLocation(_gls_shader, "view"), 1, true, view);
+
+
+	glUniform3f(glGetUniformLocation(_gls_shader, "camPos"), 
+		_gls_camera.pos.x, _gls_camera.pos.y, _gls_camera.pos.z);
 }
 
 gls_Vec3f gls_normalize(gls_Vec3f vec)
@@ -649,7 +666,7 @@ void gls_setNearFar(float near, float far)
 
 void gls_addLight(float x, float y, float z, float rx, float ry, float rz, float strength, gls_Vec3f color, int type)
 {
-	gls_Light light;
+	gls_Light light = { 0 };
 	light.pos = gls_vec3f(x, y, z);
 	light.rot = gls_vec3f(rx, ry, rz);
 	light.strength = strength;

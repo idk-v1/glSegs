@@ -83,7 +83,7 @@ gls_Vec3f gls_colorRGBtoHSV(float r, float g, float b);
 gls_Vec3f gls_colorHSVtoRGB(float h, float s, float v);
 void gls_vertex(float x, float y, float z);
 
-void gls_applyLighting(gls_Vec3f* triPtr);
+void gls_applyLighting(gls_Vec3f* tri);
 gls_Vec3f gls_applyTrans(float x, float y, float z);
 void gls_setMatrix();
 gls_Vec3f gls_normalize(gls_Vec3f vec);
